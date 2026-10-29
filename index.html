@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Trova il sollievo dall'ansia con i nostri peluche terapeutici e gli esercizi di respirazione guidati. Rilassa la mente e il corpo.">
+    <title>Laska - Peluche per l'Ansia e Rilassamento Guidato</title>
+
+    <!-- Google Fonts: Nunito per un'estetica morbida, arrotondata e terapeutica -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css?v=20260904">
+
+    <!-- Model Viewer per il rendering 3D di heart_in_love.glb -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Schermata Iniziale (Splash Screen Video Sequenza) -->
+    <div id="splash-screen" class="splash-screen-overlay">
+        <video id="splashVideo" src="inizio sito.MOV" autoplay muted playsinline></video>
+        <video id="splashVideo2" src="Inizio personalizzazione.MOV" muted playsinline style="display:none;"></video>
+        <video id="splashVideo3" src="Personalizzazionepeluche.mov" muted playsinline style="display:none;"></video>
+        <video id="splashVideo4" src="colore base.mov" muted playsinline style="display:none;"></video>
+        <video id="splashVideo5" src="cuoricino scelta .mov" muted playsinline style="display:none;"></video>
+        <video id="splashVideo6" src="nome scelta.MOV" muted playsinline style="display:none;"></video>
+        <video id="splashVideo7" src="cuore rosa coniglio grigio.MOV" muted playsinline style="display:none;"></video>
+        <video id="splashVideo8" src="coniglio ansia.mov" muted playsinline style="display:none;"></video>
+        <video id="splashVideo9" src="Aiutami.mov" muted playsinline style="display:none;"></video>
+
+        <!-- Bottone Salta Personalizzazione (appare solo durante il Video 2) -->
+        <button id="skipCustomizationBtn" style="display:none; position:absolute; left:1000px; top:700px; width:210px; height:60px; background-color:rgba(167, 136, 216, 0.43); border-radius:16px; border:none; color:#FFFFFF; font-family:'Nunito', sans-serif; font-size:1.1rem; font-weight:700; cursor:pointer; z-index:15; transition: transform 0.2s, background-color 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+            salta personalizzazione
+        </button>
+
+        <!-- Frecce di navigazione splash -->
+        <button id="splashPrevBtn" class="splash-nav-btn" style="display:none;" aria-label="Indietro">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        </button>
+        <button id="splashNextBtn" class="splash-nav-btn" aria-label="Avanti">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
+
+        <!-- Carousel Selezione Peluche -->
+        <div id="plushCarousel" class="plush-carousel-container" style="display:none;">
+            <div class="carousel-viewport" id="carouselViewport">
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="carousel-slide" data-plush-index="0" data-animal="peluche">
+                        <img src="peluche 1.png" alt="Peluche 1" class="carousel-plush-img interactive-plush" draggable="false">
+                    </div>
+                    <div class="carousel-slide" data-plush-index="1" data-animal="koala">
+                        <img src="koala 1.png" alt="Koala 1" class="carousel-plush-img interactive-plush" draggable="false">
+                    </div>
+                    <div class="carousel-slide" data-plush-index="2" data-animal="orso">
+                        <img src="orso 1.png" alt="Orso 1" class="carousel-plush-img interactive-plush" draggable="false">
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-color-dots" id="carouselDots">
+                <button class="carousel-dot" data-index="0" aria-label="Peluche 1" style="--dot-color: #C4B5A0;"></button>
+                <button class="carousel-dot active" data-index="1" aria-label="Koala 1" style="--dot-color: #A9B2C3;"></button>
+                <button class="carousel-dot" data-index="2" aria-label="Orso 1" style="--dot-color: #B08B6B;"></button>
+            </div>
+        </div>
+
+        <!-- Carousel Selezione Colore -->
+        <div id="colorCarousel" class="plush-carousel-container" style="display:none;">
+            <div class="carousel-viewport" id="colorCarouselViewport">
+                <div class="carousel-track" id="colorCarouselTrack">
+                    <!-- Popolato dinamicamente da app.js -->
+                </div>
+            </div>
+            <div class="carousel-color-dots" id="colorCarouselDots">
+                <!-- Popolato dinamicamente da app.js -->
+            </div>
+        </div>
+
+        <!-- Carousel Selezione Cuore -->
+        <div id="heartCarousel" class="plush-carousel-container" style="display:none;">
+            <div class="carousel-viewport" id="heartCarouselViewport">
+                <div class="carousel-track" id="heartCarouselTrack">
+                    <div class="carousel-slide active" data-heart-index="0" data-heart-key="rosa">
+                        <img src="Cuore rosa.png" alt="Cuore Rosa" class="carousel-plush-img" draggable="false">
+                    </div>
+                    <div class="carousel-slide" data-heart-index="1" data-heart-key="giallo">
+                        <img src="heart giallo sfocato.png" alt="Cuore Giallo" class="carousel-plush-img" draggable="false">
+                    </div>
+                    <div class="carousel-slide" data-heart-index="2" data-heart-key="azzurro">
+                        <img src="Cuore rosa.png" alt="Cuore Azzurro" class="carousel-plush-img" style="filter: hue-rotate(200deg) saturate(1.2);" draggable="false">
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-color-dots" id="heartCarouselDots">
+                <button class="carousel-dot active" data-index="0" aria-label="Cuore Rosa" style="--dot-color: #F8C3DC;"></button>
+                <button class="carousel-dot" data-index="1" aria-label="Cuore Giallo" style="--dot-color: #FFE066;"></button>
+                <button class="carousel-dot" data-index="2" aria-label="Cuore Azzurro" style="--dot-color: #87CEEB;"></button>
+            </div>
+        </div>
+
+        <!-- Testo per coniglio ansia.mov -->
+        <div id="coniglioAnsiaSub" style="display:none; position:absolute; top:150px; left:0; width:100%; z-index:10; font-family:'Nunito', sans-serif; font-size:1.6rem; font-weight:400; color:#D2B9FF; text-align:center; text-shadow: 0 2px 10px rgba(0,0,0,0.5); animation: carouselFadeIn 0.8s ease both; pointer-events:none;">
+            Shh... Lily sta facendo un brutto sogno.
+        </div>
+
+        <!-- Bottoni coniglio ansia -->
+        <button id="helpMeBtn" style="display:none; position:absolute; left:400px; top:600px; width:210px; height:60px; background-color:rgba(167, 136, 216, 0.43); border-radius:16px; border:none; color:#FFFFFF; font-family:'Nunito', sans-serif; font-size:1.1rem; font-weight:700; cursor:pointer; z-index:15; transition: transform 0.2s, background-color 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+            aiutami
+        </button>
+        <button id="goAheadBtn" style="display:none; position:absolute; left:900px; top:600px; width:210px; height:60px; background-color:rgba(167, 136, 216, 0.43); border-radius:16px; border:none; color:#FFFFFF; font-family:'Nunito', sans-serif; font-size:1.1rem; font-weight:700; cursor:pointer; z-index:15; transition: transform 0.2s, background-color 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+            vai avanti
+        </button>
+
+        <!-- Esercizio Respirazione -->
+        <div id="breathingExercise" style="display:none; position:absolute; top:650px; left:50%; transform:translateX(-50%); z-index:10; font-family:'Nunito', sans-serif; text-align:center; color:#D2B9FF;">
+            <div id="breathingCircle" style="width:60px; height:60px; border-radius:50%; background-color:rgba(167, 136, 216, 0.3); border: 2px solid #D2B9FF; margin: 0 auto 15px auto; transition: transform 4s ease-in-out, background-color 4s ease-in-out; box-shadow: 0 0 20px rgba(167, 136, 216, 0.4);"></div>
+            <div id="breathingText" style="font-size:1.2rem; font-weight:700; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">Inspira...</div>
+        </div>
+
+        <!-- Successo Respirazione -->
+        <div id="breathingSuccess" style="display:none; position:absolute; top:150px; left:0; width:100%; z-index:15; font-family:'Nunito', sans-serif; font-size:2.5rem; font-weight:700; color:#FFFFFF; text-align:center; text-shadow: 0 2px 15px rgba(0,0,0,0.8); animation: carouselFadeIn 1s ease both;">
+            complimenti! laly si è calmata
+        </div>
+    </div>
+
+    <!-- Sfondo con sfere fluttuanti sfocate (Soft Orbs Effect) -->
+    <div class="background-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+
+
+
+
+    <!-- Contenitore Principale -->
+    <main class="main-content">
+
+        <!-- HEADER di Navigazione Sticky -->
+        <header class="logo-header">
+            <div class="logo-text-wrapper">
+                <div class="logo">
+                    <img src="LASKA.png" alt="Laska Logo" class="logo-img">
+                </div>
+                <div class="tagline">Senti il tuo cuore. Respira.</div>
+            </div>
+
+            <div class="header-right">
+                <!-- Selettore del Tema Cromatico -->
+                <div class="theme-selector">
+                    <button class="theme-toggle-btn active" id="themeOriginalBtn" aria-label="Tema Lilla"
+                        title="Tema Lilla"></button>
+                    <button class="theme-toggle-btn" id="themeBlueBtn" aria-label="Tema Azzurro Blu"
+                        title="Tema Azzurro Blu"></button>
+                </div>
+
+                <!-- Pulsante Stanza della Calma -->
+                <button class="room-nav-btn" id="headerRoomBtn" aria-label="Vai alla Stanza della Pioggia"
+                    title="Stanza della Pioggia">
+                    <span class="room-nav-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg></span> Stanza
+                </button>
+
+
+                <!-- Pulsante Carrello -->
+                <button class="cart-btn" id="cartBtn" aria-label="Apri carrello" aria-expanded="false"
+                    aria-controls="cartDrawer">
+                    <span class="cart-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1" />
+                            <circle cx="20" cy="21" r="1" />
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                        </svg></span>
+                    <span class="cart-badge" id="cartBadge">0</span>
+                </button>
+
+                <!-- Pulsante Menu Hamburger -->
+                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Apri menu di navigazione"
+                    aria-expanded="false" aria-controls="sideMenu">
+                    <span class="hamburger-line line-1"></span>
+                    <span class="hamburger-line line-2"></span>
+                    <span class="hamburger-line line-3"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Vista Principale (Home) -->
+        <div id="home-view" class="page-view active visible">
+
+            <!-- SECTION 1 — HERO: THE HEARTBEAT -->
+            <section class="hero-section">
+                <!-- Sfondo Video Infinito -->
+                <video id="heroBgVideo" src="video ripetizione.mov" autoplay loop muted playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1;"></video>
+                
+
+                <!-- Pixel Stars Background Overlay -->
+                <div class="pixel-stars-container" id="pixelStarsBackground"></div>
+
+
+                <!-- Blurry Yellow Heart Background Glow -->
+                <div class="hero-blur-yellow-heart">
+                    <img src="yellow heart.png" alt="Cuore Giallo Sfocato">
+                </div>
+
+                <!-- Dynamic BPM Progress Bar (Calm to Agitated) -->
+
+
+
+                <div class="hero-container">
+                    <!-- Visualizzatore 3D centrato -->
+                    <div class="heart-viewer-container" id="heartViewerContainer">
+                        <!-- Floating Name and Streak Badge (Phases 1 & 4) -->
+                        <div class="plush-floating-name" id="plushFloatingName"></div>
+                        <div class="plush-streak-badge" id="plushStreakBadge"></div>
+
+                        <!-- Breathing Aura Glow (Phase 4 Extension) -->
+                        <div class="breathing-aura-glow" id="breathingAuraGlow"></div>
+
+                        <!-- 4-7-8 Breathing Ring SVG (Phase 4) -->
+                        <svg class="breathing-ring-svg" id="breathingRingSvg" viewBox="0 0 320 320">
+                            <circle class="ring-bg" cx="160" cy="160" r="145"></circle>
+                            <circle class="ring-active" id="breathingRingActive" cx="160" cy="160" r="145"></circle>
+                        </svg>
+
+                        <!-- Plush and features wrapped (Phase 1) -->
+                        <div class="plush-wrapper enlarged" id="plushWrapper">
+                            <!-- Stage Peluche 3D Interattivo -->
+                            <div class="plush-3d-stage" id="plush3dStage">
+                                <div class="plush-3d-card" id="plush3dCard">
+                                    <div class="plush-3d-glare" id="plush3dGlare"></div>
+                                    <img src="peluche 1.png" alt="Peluche Laska 3D" id="heroPelucheImg" class="hero-peluche-img plush-3d-img interactive-plush" draggable="false">
+                                </div>
+                                <div class="plush-3d-shadow" id="plush3dShadow"></div>
+                            </div>
+
+                            <!-- Floating stars container (Phase 2) -->
+                            <div class="plush-stars-container" id="plushStarsContainer"></div>
+
+                            <!-- Badge Istruzioni e Controllo 3D -->
+                            <div class="plush-3d-badge-container">
+                                <button id="toggle3dAutoRotateBtn" class="btn-3d-control" aria-label="Attiva/Disattiva Rotazione Automatica 3D" title="Clicca per attivare/disattivare rotazione automatica">
+                                    <span class="badge-icon">🔄</span>
+                                    <span class="badge-text">3D Roteabile — Trascina per Ruotare</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Modello 3D (Nascosto) -->
+                        <model-viewer id="heartViewer" class="enlarged" src="heart_in_love.glb" scale="0.6 0.6 0.6"
+                            alt="Modello 3D di un cuore per rilassamento" auto-rotate auto-rotate-delay="0"
+                            rotation-per-second="15deg" camera-controls interaction-prompt="none" shadow-intensity="0"
+                            shadow-softness="0.8" environment-image="neutral" exposure="1.0" disable-zoom
+                            aria-label="Modello 3D del cuore" style="display:none;">
+                        </model-viewer>
+
+                        <!-- Speech Bubble per il Peluche -->
+                        <div class="plush-speech-bubble" id="plushSpeechBubble">
+                            Vuoi aiutarmi a trovare la calma? Fai un respiro profondo con me...
+                        </div>
+
+                        <!-- Video Coniglio Cuore che Batte (Nascosto a favore del Peluche 3D) -->
+                        <video id="homeRabbitVideo" src="cuore che batte.mov" autoplay loop muted playsinline style="width: 100%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin: 0 auto; display: none;"></video>
+                    </div>
+
+                    <!-- Interactive Calming Panel (Phase 4 Extension) -->
+                    <div class="calming-panel-card" id="calmingPanelCard">
+                        <!-- Header of the Card -->
+                        <div class="calming-panel-header">
+                            <div class="bpm-display-row">
+                                <span class="heart-pulse-icon">💓</span>
+                                <div class="bpm-display-card">
+                                    <span class="bpm-number" id="bpmNumber">--</span>
+                                    <span class="bpm-unit">BPM</span>
+                                </div>
+                            </div>
+                            <div class="mute-volume-wrapper">
+                                <span class="calming-status-badge" id="bpmStatusLabel">Stato: Agitato</span>
+                                <button class="mute-btn" id="muteHeartBtn" aria-label="Silenzia battito">
+                                    <svg class="icon icon-volume" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path class="volume-up" d="M11 5L6 9H2v6h4l5 4V5z" />
+                                        <path class="volume-waves"
+                                            d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" />
+                                        <path class="volume-mute" d="M23 9l-6 6m0-6l6 6" style="display: none;" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Method Tabs/Selectors -->
+                        <div class="calming-methods-tabs">
+                            <button class="method-tab active" data-method="breathe" id="tabBreathe">🧘‍♂️
+                                Respira</button>
+                            <button class="method-tab" data-method="stroke" id="tabStroke">🐾 Accarezza</button>
+                            <button class="method-tab" data-method="sync" id="tabSync">💓 Sintonizza</button>
+                        </div>
+
+                        <!-- Method Content Areas -->
+                        <div class="method-content-container">
+
+                            <!-- METHOD 1: BREATHE -->
+                            <div class="method-content active" id="method-breathe">
+                                <p class="method-instruction">Tieni premuto sul pulsante per INSPIRARE, rilascia per
+                                    ESPIRARE.</p>
+                                <button class="calming-action-btn breathe-trigger-btn" id="breatheHoldBtn">
+                                    <span class="btn-text" id="breatheBtnText">TIENI PREMUTO</span>
+                                    <span class="btn-progress" id="breatheBtnProgress"></span>
+                                </button>
+                                <div class="breathing-progress-dots">
+                                    <span class="breath-dot active" id="dot-0"></span>
+                                    <span class="breath-dot" id="dot-1"></span>
+                                    <span class="breath-dot" id="dot-2"></span>
+                                </div>
+                            </div>
+
+                            <!-- METHOD 2: STROKE -->
+                            <div class="method-content" id="method-stroke">
+                                <p class="method-instruction">Muovi lentamente il cursore (o il dito) dentro l'area per
+                                    accarezzare Laska.</p>
+                                <div class="stroke-sensing-area" id="strokeArea">
+                                    <span class="stroke-label" id="strokeStatus">ACCARIZZAMI LENTAMENTE</span>
+                                    <div class="stroke-sparkle-container" id="strokeSparkles"></div>
+                                </div>
+                                <div class="stroke-progress-bar-container">
+                                    <div class="stroke-progress-bar" id="strokeProgressBar"></div>
+                                </div>
+                            </div>
+
+                            <!-- METHOD 3: SYNC -->
+                            <div class="method-content" id="method-sync">
+                                <p class="method-instruction">Tappa il pulsante a ritmo del cuore lento (ogni 1s) per
+                                    sintonizzarlo.</p>
+                                <div class="sync-target-indicator">
+                                    <span class="target-heart" id="syncTargetHeart">💓</span>
+                                    <span class="target-bpm-label">Target: 60 BPM</span>
+                                </div>
+                                <button class="calming-action-btn sync-tap-btn" id="syncTapBtn">TAPPA A RITMO</button>
+                                <p class="sync-feedback-label" id="syncFeedback">Tappa per sintonizzare</p>
+                            </div>
+
+                        </div>
+
+                        <!-- Skip / Manual Controls -->
+                        <div class="calming-panel-footer">
+                            <div class="manual-slider-group hidden" id="manualSliderGroup">
+                                <div class="bpm-slider-container">
+                                    <span class="slider-label">Calma (40)</span>
+                                    <input type="range" id="bpmSlider" min="40" max="160" value="120"
+                                        class="custom-slider">
+                                    <span class="slider-label">Ansia (160)</span>
+                                </div>
+                            </div>
+                            <button class="btn-skip-calm" id="skipCalmingBtn">Salta sintonia</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2 — ANXIETY RELIEF EXERCISES -->
+            <section class="exercises-section">
+                <div class="section-header">
+                    <h2 class="section-title">Esercizi per calmare l'ansia</h2>
+                    <p class="section-subtitle">Scegli una pratica guidata per rallentare il respiro e stabilizzare la
+                        mente.</p>
+                </div>
+
+                <!-- Griglia degli Esercizi (Design a schede morbide) -->
+                <div class="exercises-grid">
+
+                    <!-- Esercizio 1: Ascolta il battito -->
+                    <article class="exercise-card">
+                        <div class="exercise-badge">Esercizio 1</div>
+                        <h3 class="exercise-title">Ascolta il battito</h3>
+                        <p class="exercise-desc">Segui il ritmo del cuore pulsante. Sincronizza il tuo respiro con la
+                            sua pulsazione lenta e naturale.</p>
+                        <div class="teaser-action">
+                            <button class="btn btn-primary exercise-teaser-btn" data-exercise="1">Inizia
+                                Esercizio</button>
+                        </div>
+                    </article>
+
+                    <!-- Esercizio 2: 5-4-3-2-1 Grounding -->
+                    <article class="exercise-card">
+                        <div class="exercise-badge">Esercizio 2</div>
+                        <h3 class="exercise-title">Torna al presente</h3>
+                        <p class="exercise-desc">Un esercizio interattivo di radicamento. Concentrati su ciò che ti
+                            circonda passo dopo passo.</p>
+                        <div class="teaser-action">
+                            <button class="btn btn-primary exercise-teaser-btn" data-exercise="2">Inizia
+                                Esercizio</button>
+                        </div>
+                    </article>
+
+                    <!-- Esercizio 3: Box Breathing -->
+                    <article class="exercise-card">
+                        <div class="exercise-badge">Esercizio 3</div>
+                        <h3 class="exercise-title">Respirazione quadrata</h3>
+                        <p class="exercise-desc">Un ciclo di quattro fasi per stabilizzare il sistema nervoso. Segui la
+                            linea luminosa.</p>
+                        <div class="teaser-action">
+                            <button class="btn btn-primary exercise-teaser-btn" data-exercise="3">Inizia
+                                Esercizio</button>
+                        </div>
+                    </article>
+
+                    <!-- Esercizio 4: Progressive Muscle Relaxation -->
+                    <article class="exercise-card">
+                        <div class="exercise-badge">Esercizio 4</div>
+                        <h3 class="exercise-title">Rilassa i muscoli</h3>
+                        <p class="exercise-desc">Alterna tensione e rilassamento per rilasciare lo stress fisico
+                            accumulato nel corpo.</p>
+                        <div class="teaser-action">
+                            <button class="btn btn-primary exercise-teaser-btn" data-exercise="4">Inizia
+                                Esercizio</button>
+                        </div>
+                    </article>
+
+                    <!-- Esercizio 5: Terapia del suono -->
+                    <article class="exercise-card">
+                        <div class="exercise-badge">Esercizio 5</div>
+                        <h3 class="exercise-title">Terapia del suono</h3>
+                        <p class="exercise-desc">Ascolta paesaggi sonori e frequenze terapeutiche sintetizzate per
+                            calmare la mente.</p>
+                        <div class="teaser-action">
+                            <button class="btn btn-primary exercise-teaser-btn" data-exercise="5">Inizia
+                                Esercizio</button>
+                        </div>
+                    </article>
+
+                    <!-- Esercizio 6: Respiro profondo -->
+                    <article class="exercise-card">
+                        <div class="exercise-badge">Esercizio 6</div>
+                        <h3 class="exercise-title">Respiro profondo</h3>
+                        <p class="exercise-desc">Riduci lo stress con la respirazione diaframmatica (5-2-5). Segui il
+                            cerchio luminoso.</p>
+                        <div class="teaser-action">
+                            <button class="btn btn-primary exercise-teaser-btn" data-exercise="6">Inizia
+                                Esercizio</button>
+                        </div>
+                    </article>
+
+                </div>
+            </section>
+
+            <!-- BANNER DEL TEST DEI PELUCHE -->
+            <section class="plush-quiz-banner-section">
+                <div class="plush-quiz-banner-container card-prevention">
+                    <div class="plush-quiz-banner-content">
+                        <div class="banner-badge">Test Interattivo</div>
+                        <h3 class="banner-title">Qual è il tuo compagno Laska ideale?</h3>
+                        <p class="banner-desc">Rispondi a poche domande sulle tue abitudini, paure e inclinazioni per
+                            scoprire quale dei nostri peluche terapeutici si allinea perfettamente alle tue necessità di
+                            rilassamento.</p>
+                        <button class="btn btn-primary" id="homeToPlushQuizBtn">Scopri il tuo Peluche</button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- SECTION 3 — PRODUCT SECTION -->
+            <section class="products-section">
+                <div class="section-header">
+                    <h2 class="section-title">I tuoi compagni per la calma</h2>
+                    <p class="section-subtitle">Peluche morbidi terapeutici con un cuore pulsante interno progettati per
+                        placare l'ansia.</p>
+                </div>
+
+                <!-- Griglia dei Prodotti -->
+                <div class="products-grid">
+
+                    <!-- Prodotto 1: Orsetto -->
+                    <article class="product-card clickable-product" data-product-id="1">
+                        <div class="product-image-container">
+                            <img src="orso 1.png" alt="Peluche Orsetto"
+                                class="product-img interactive-plush">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Orsetto Lavanda</h3>
+                            <p class="product-desc">Il tuo compagno ideale per i momenti difficili. Rilascia un delicato
+                                aroma rilassante e simula un respiro calmo.</p>
+                            <div class="product-meta">
+                                <span class="product-price">34,90 €</span>
+                                <button class="btn btn-secondary select-product-btn" data-product-id="1">Scopri di
+                                    più</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Prodotto 2: Peluche -->
+                    <article class="product-card clickable-product" data-product-id="2">
+                        <div class="product-image-container">
+                            <img src="peluche 1.png" alt="Peluche Calmo"
+                                class="product-img interactive-plush">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Peluche Calmo</h3>
+                            <p class="product-desc">Morbido peluche rassicurante con sensore di battito
+                                cardiaco integrato per rassicurare bambini e adulti.</p>
+                            <div class="product-meta">
+                                <span class="product-price">34,90 €</span>
+                                <button class="btn btn-secondary select-product-btn" data-product-id="2">Scopri di
+                                    più</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Prodotto 3: Koala -->
+                    <article class="product-card clickable-product" data-product-id="3">
+                        <div class="product-image-container">
+                            <img src="koala 1.png" alt="Peluche Koala"
+                                class="product-img interactive-plush">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Koala Rilassante</h3>
+                            <p class="product-desc">Progettato per l'abbraccio profondo. Il suo corpo pesante e il
+                                battito caldo aiutano ad addormentarsi in pace.</p>
+                            <div class="product-meta">
+                                <span class="product-price">39,90 €</span>
+                                <button class="btn btn-secondary select-product-btn" data-product-id="3">Scopri di
+                                    più</button>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+            </section>
+
+        </div> <!-- Fine home-view -->
+
+        <!-- Vista Informazioni -->
+        <div id="info-view" class="page-view">
+
+            <!-- SECTION 1.5 — VIVERE CON L'ANSIA (AWARENESS) -->
+            <section class="anxiety-experience-section" id="anxiety-section">
+                <header class="section-header anxiety-header">
+                    <div class="anxiety-title-tag">Sensibilizzazione</div>
+                    <h2 class="section-title">Quello che senti ha un nome.</h2>
+                    <p class="section-subtitle">E no, non stai esagerando.</p>
+                </header>
+
+                <div class="anxiety-experience">
+                    <h3 class="experience-headline">Com'è vivere con l'ansia dall'interno</h3>
+                    <p class="experience-intro-text">
+                        L'ansia non è una semplice preoccupazione passeggera. È un'esperienza fisica e mentale
+                        totalizzante, un rumore di fondo costante che altera la percezione della realtà quotidiana.
+                    </p>
+
+                    <div class="experience-grid">
+                        <div class="experience-card">
+                            <div class="experience-card-icon">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M12 8v4M12 16h.01" />
+                                </svg>
+                            </div>
+                            <h4>Il risveglio col peso</h4>
+                            <p>Svegliarsi la mattina con un peso opprimente sul petto, prima ancora che i pensieri
+                                abbiano il tempo di prendere una forma.</p>
+                        </div>
+
+                        <div class="experience-card">
+                            <div class="experience-card-icon">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                                </svg>
+                            </div>
+                            <h4>Il cuore accelerato</h4>
+                            <p>Il cuore che accelera all'improvviso, senza alcun motivo apparente, facendoti sentire in
+                                costante emergenza fisica.</p>
+                        </div>
+
+                        <div class="experience-card">
+                            <div class="experience-card-icon">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M8 12h8M12 8v8" />
+                                </svg>
+                            </div>
+                            <h4>I pensieri inarrestabili</h4>
+                            <p>La mente che non si spegne mai, un loop infinito di scenari futuri, dubbi e ipotesi
+                                catastrofiche che analizzano ogni dettaglio.</p>
+                        </div>
+
+                        <div class="experience-card">
+                            <div class="experience-card-icon">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                    <line x1="12" y1="9" x2="12" y2="13" />
+                                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                                </svg>
+                            </div>
+                            <h4>L'allerta costante</h4>
+                            <p>Sentirsi in pericolo imminente anche quando ti trovi in un luogo perfettamente sicuro,
+                                circondato da affetto.</p>
+                        </div>
+
+                        <div class="experience-card">
+                            <div class="experience-card-icon">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                </svg>
+                            </div>
+                            <h4>La fatica del silenzio</h4>
+                            <p>La stanchezza invisibile di dover gestire questa tempesta interna fingendo che tutto vada
+                                bene per non allarmare nessuno.</p>
+                        </div>
+
+                        <div class="experience-card">
+                            <div class="experience-card-icon">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                                </svg>
+                            </div>
+                            <h4>La paura di essere "troppo"</h4>
+                            <p>Quella sensazione opprimente di essere un peso o di risultare "troppo complicato" o
+                                fragile per le persone che ti sono vicine.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="awareness-block">
+                    <div class="awareness-header">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="16" x2="12" y2="12" />
+                            <line x1="12" y1="8" x2="12.01" y2="8" />
+                        </svg>
+                        <h3>Quello che in pochi capiscono</h3>
+                    </div>
+
+                    <div class="stat-container">
+                        <div class="stat-box">
+                            <span class="stat-number">300M+</span>
+                            <p class="stat-desc">Le persone nel mondo che convivono ogni giorno con disturbi d'ansia,
+                                secondo i dati dell'Organizzazione Mondiale della Sanità (OMS). Rappresentano circa il
+                                4% della popolazione globale. <strong>Non sei solo.</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="myths-section">
+                        <h4 class="myths-title">Smontare i pregiudizi più comuni:</h4>
+                        <div class="myth-cards-grid">
+                            <div class="myth-card">
+                                <div class="myth-header-row">
+                                    <span class="myth-tag myth-tag-prejudice">Pregiudizio</span>
+                                    <span class="myth-phrase">"Ma dai, rilassati un attimo!"</span>
+                                </div>
+                                <div class="myth-separator"></div>
+                                <div class="myth-header-row">
+                                    <span class="myth-tag myth-tag-reality">La realtà</span>
+                                    <span class="myth-reality">L'ansia è una risposta biologica involontaria del sistema
+                                        nervoso autonomo. Non si disattiva semplicemente con un comando di
+                                        volontà.</span>
+                                </div>
+                            </div>
+
+                            <div class="myth-card">
+                                <div class="myth-header-row">
+                                    <span class="myth-tag myth-tag-prejudice">Pregiudizio</span>
+                                    <span class="myth-phrase">"È tutto nella tua testa, stai esagerando."</span>
+                                </div>
+                                <div class="myth-separator"></div>
+                                <div class="myth-header-row">
+                                    <span class="myth-tag myth-tag-reality">La realtà</span>
+                                    <span class="myth-reality">I sintomi dell'ansia sono reali e fisici: tensione
+                                        muscolare, tachicardia, vertigini e stanchezza cronica oggettiva causata dal
+                                        cortisolo.</span>
+                                </div>
+                            </div>
+
+                            <div class="myth-card">
+                                <div class="myth-header-row">
+                                    <span class="myth-tag myth-tag-prejudice">Pregiudizio</span>
+                                    <span class="myth-phrase">"Tutti hanno stress, impara a ignorarlo."</span>
+                                </div>
+                                <div class="myth-separator"></div>
+                                <div class="myth-header-row">
+                                    <span class="myth-tag myth-tag-reality">La realtà</span>
+                                    <span class="myth-reality">Lo stress quotidiano è una risposta temporanea. L'ansia è
+                                        una condizione persistente che influisce attivamente sulla qualità della vita,
+                                        sul sonno e sul benessere.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="empathy-message">
+                        <p>
+                            A chi non vive l'ansia: a volte basta solo esserci. Non serve dare soluzioni o minimizzare
+                            quello che proviamo. La tua presenza silenziosa e non giudicante è il regalo più grande.
+                        </p>
+                    </div>
+
+                    <div class="understanding-invite">
+                        <p>
+                            Comprendere l'ansia significa creare uno spazio sicuro dove nessuno debba nascondere la
+                            propria vulnerabilità o sentirsi sbagliato.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="experience-cta">
+                    <h3>Non devi affrontare tutto questo da solo.</h3>
+                    <p>Prenditi un momento per ristabilire l'equilibrio. Il tuo respiro è la tua ancora.</p>
+                    <div class="cta-actions">
+                        <button class="btn btn-primary" id="anxietyToExercisesBtn" style="gap: 8px;">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" />
+                            </svg>
+                            Rilassati con gli Esercizi
+                        </button>
+                        <button class="btn btn-secondary" id="anxietyToQuizBtn" style="gap: 8px;">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10 9 9 9 8 9" />
+                            </svg>
+                            Fai il Test Ansia o Panico
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2.5 — EDUCATION & PREVENTION -->
+            <section class="education-section">
+                <div class="section-header">
+                    <h2 class="section-title">Comprendere e prevenire l'ansia</h2>
+                    <p class="section-subtitle">Consigli pratici quotidiani e differenze fondamentali per imparare a
+                        conoscersi.</p>
+                </div>
+
+                <div class="education-container">
+                    <!-- Colonna 1: Prevenzione -->
+                    <article class="edu-card card-prevention">
+                        <h3 class="edu-card-title"><svg class="icon" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                style="margin-right: 8px; font-size: 1.25rem; color: var(--accent-color);">
+                                <path
+                                    d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1 .5 2.2 1.5 3 .7.7 1.3 1.5 1.5 2.5" />
+                                <line x1="9" y1="18" x2="15" y2="18" />
+                                <line x1="10" y1="22" x2="14" y2="22" />
+                            </svg>Come prevenire l'ansia</h3>
+                        <p class="edu-card-desc">Piccole abitudini che riequilibrano il sistema nervoso e riducono
+                            l'allerta fisiologica:</p>
+
+                        <ul class="prevention-list">
+                            <li class="prevention-item">
+                                <span class="item-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                                        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                                        <line x1="6" y1="1" x2="6" y2="4" />
+                                        <line x1="10" y1="1" x2="10" y2="4" />
+                                        <line x1="14" y1="1" x2="14" y2="4" />
+                                    </svg>
+                                </span>
+                                <div class="item-content">
+                                    <strong>Evitare eccitanti (Caffeina & Alcol)</strong>
+                                    <p>La caffeina stimola il rilascio di adrenalina, mimando fisicamente i sintomi
+                                        dell'ansia come tachicardia e agitazione.</p>
+                                </div>
+                            </li>
+                            <li class="prevention-item">
+                                <span class="item-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                                    </svg>
+                                </span>
+                                <div class="item-content">
+                                    <strong>Attività fisica regolare</strong>
+                                    <p>Anche solo 20 minuti di camminata al giorno riducono i livelli di cortisolo
+                                        (l'ormone dello stress) e stimolano le endorfine.</p>
+                                </div>
+                            </li>
+                            <li class="prevention-item">
+                                <span class="item-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                                    </svg>
+                                </span>
+                                <div class="item-content">
+                                    <strong>Routine del sonno stabile</strong>
+                                    <p>La privazione del sonno altera i recettori dell'amigdala, amplificando la
+                                        percezione delle minacce quotidiane.</p>
+                                </div>
+                            </li>
+                            <li class="prevention-item">
+                                <span class="item-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path
+                                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                    </svg>
+                                </span>
+                                <div class="item-content">
+                                    <strong>Evitare di sovraccaricarsi (Rilassamento)</strong>
+                                    <p>Dedicati dei momenti in cui "non fare nulla". Dire di no alle richieste eccessive
+                                        è il primo passo per non agitarsi.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </article>
+
+                    <!-- Colonna 2: Ansia vs Panico -->
+                    <article class="edu-card card-difference">
+                        <h3 class="edu-card-title"><svg class="icon" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                style="margin-right: 8px; font-size: 1.25rem; color: var(--accent-color);">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                            </svg>Ansia vs Panico</h3>
+                        <p class="edu-card-desc">Spesso confusi, presentano caratteristiche fisiche e temporali
+                            profondamente diverse:</p>
+
+                        <div class="comparison-table">
+                            <div class="table-header-row">
+                                <div class="col-feature">Caratteristica</div>
+                                <div class="col-anxiety">Attacco d'Ansia</div>
+                                <div class="col-panic">Attacco di Panico</div>
+                            </div>
+
+                            <div class="table-row">
+                                <div class="col-feature"><strong>Insorgenza</strong></div>
+                                <div class="col-anxiety">Graduale (giorni o ore)</div>
+                                <div class="col-panic">Improvviso (picco in 10m)</div>
+                            </div>
+
+                            <div class="table-row">
+                                <div class="col-feature"><strong>Elemento Scatenante</strong></div>
+                                <div class="col-anxiety">Preoccupazione specifica</div>
+                                <div class="col-panic">Spesso senza motivo apparente</div>
+                            </div>
+
+                            <div class="table-row">
+                                <div class="col-feature"><strong>Intensità Fisica</strong></div>
+                                <div class="col-anxiety">Moderata e accumulativa</div>
+                                <div class="col-panic">Estrema (paura di morire/impazzire)</div>
+                            </div>
+
+                            <div class="table-row">
+                                <div class="col-feature"><strong>Durata</strong></div>
+                                <div class="col-anxiety">Prolungata (settimane/mesi)</div>
+                                <div class="col-panic">Breve (circa 15-30 minuti)</div>
+                            </div>
+                        </div>
+
+                        <div class="edu-note">
+                            <p><strong>Nota terapeutica:</strong> Entrambi gli stati traggono enorme beneficio dagli
+                                esercizi di respirazione diaframmatica lenta (5-2-5) che riducono il feedback di
+                                emergenza inviato al cervello.</p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- SECTION 2.7 — SPOTIFY COMMUNITY PLAYLISTS -->
+            <section class="spotify-exchange-section"
+                style="margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--panel-border);">
+                <div class="section-header">
+                    <h2 class="section-title">Playlist Calma della Community</h2>
+                    <p class="section-subtitle">Ascolta le playlist Spotify condivise da altre persone e condividi
+                        quelle che ti aiutano a combattere l'ansia.</p>
+                </div>
+
+                <div class="spotify-exchange-container">
+                    <!-- Form per inserire una playlist -->
+                    <div class="spotify-form-card">
+                        <h3>Condividi una Playlist</h3>
+                        <p>Inserisci il link di una playlist Spotify rilassante che ti aiuta a ritrovare il benessere
+                            emotivo.</p>
+                        <form id="spotifyShareForm" class="spotify-share-form">
+                            <div class="form-group" style="margin-bottom: 1.2rem;">
+                                <label for="playlistTitle"
+                                    style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem;">Titolo
+                                    della Playlist</label>
+                                <input type="text" id="playlistTitle" placeholder="Es. Melodie per Box Breathing"
+                                    required
+                                    style="width: 100%; padding: 0.8rem; border-radius: 12px; border: 1px solid var(--panel-border); background: rgba(255, 255, 255, 0.05); color: var(--text-color); font-family: inherit;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1.2rem;">
+                                <label for="playlistUrl"
+                                    style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem;">Link
+                                    Spotify</label>
+                                <input type="url" id="playlistUrl"
+                                    placeholder="Es. https://open.spotify.com/playlist/..." required
+                                    style="width: 100%; padding: 0.8rem; border-radius: 12px; border: 1px solid var(--panel-border); background: rgba(255, 255, 255, 0.05); color: var(--text-color); font-family: inherit;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label for="playlistGenre"
+                                    style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem;">Genere
+                                    Musicale</label>
+                                <select id="playlistGenre"
+                                    style="width: 100%; padding: 0.8rem; border-radius: 12px; border: 1px solid var(--panel-border); background: rgba(255, 255, 255, 0.05); color: var(--text-color); font-family: inherit; cursor: pointer;">
+                                    <option value="Ambient"
+                                        style="background: var(--bg-color); color: var(--text-color);">Ambient / Synth
+                                    </option>
+                                    <option value="Nature"
+                                        style="background: var(--bg-color); color: var(--text-color);">Suoni della
+                                        Natura</option>
+                                    <option value="Lo-Fi"
+                                        style="background: var(--bg-color); color: var(--text-color);">Lo-Fi Chill
+                                    </option>
+                                    <option value="Classical"
+                                        style="background: var(--bg-color); color: var(--text-color);">Classica
+                                        Rilassante</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Condividi con la community</button>
+                        </form>
+                    </div>
+
+                    <!-- Griglia di playlist condivise -->
+                    <div class="spotify-list-container">
+                        <h3>Playlist Condivise</h3>
+                        <div class="spotify-playlists-grid" id="spotifyPlaylistsGrid">
+                            <!-- Playlist predefinite -->
+                            <div class="playlist-card">
+                                <div class="playlist-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        style="color: #1DB954;">
+                                        <path d="M9 18V5l12-2v13" />
+                                        <circle cx="6" cy="18" r="3" />
+                                        <circle cx="18" cy="16" r="3" />
+                                    </svg>
+                                </div>
+                                <div class="playlist-details">
+                                    <h4>Deep Ambient Relief</h4>
+                                    <span class="playlist-genre">Ambient</span>
+                                    <p>Suoni spaziali caldi, sintetizzatori analogici e campane tibetane per abbassare
+                                        il battito.</p>
+                                </div>
+                                <a href="https://open.spotify.com/playlist/37i9dQZF1DWWY4n5G5T323" target="_blank"
+                                    class="playlist-play-btn" aria-label="Ascolta su Spotify">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="5 3 19 12 5 21 5 3" />
+                                    </svg>
+                                </a>
+                            </div>
+
+                            <div class="playlist-card">
+                                <div class="playlist-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        style="color: #1DB954;">
+                                        <path d="M9 18V5l12-2v13" />
+                                        <circle cx="6" cy="18" r="3" />
+                                        <circle cx="18" cy="16" r="3" />
+                                    </svg>
+                                </div>
+                                <div class="playlist-details">
+                                    <h4>Lo-Fi Anxiety Chill</h4>
+                                    <span class="playlist-genre">Lo-Fi</span>
+                                    <p>Battiti lenti e accoglienti, melodie nostalgiche e suoni morbidi per rilassare il
+                                        sistema nervoso.</p>
+                                </div>
+                                <a href="https://open.spotify.com/playlist/37i9dQZF1DWWQRwui0EXPn" target="_blank"
+                                    class="playlist-play-btn" aria-label="Ascolta su Spotify">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="5 3 19 12 5 21 5 3" />
+                                    </svg>
+                                </a>
+                            </div>
+
+                            <div class="playlist-card">
+                                <div class="playlist-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        style="color: #1DB954;">
+                                        <path d="M9 18V5l12-2v13" />
+                                        <circle cx="6" cy="18" r="3" />
+                                        <circle cx="18" cy="16" r="3" />
+                                    </svg>
+                                </div>
+                                <div class="playlist-details">
+                                    <h4>Nature & Forest Rain</h4>
+                                    <span class="playlist-genre">Nature</span>
+                                    <p>Pioggia scrosciante, vento che sussurra tra gli alberi ed echi di uccellini
+                                        cinguettanti della foresta.</p>
+                                </div>
+                                <a href="https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO" target="_blank"
+                                    class="playlist-play-btn" aria-label="Ascolta su Spotify">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="5 3 19 12 5 21 5 3" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div> <!-- Fine info-view -->
+
+        <!-- Vista Quiz -->
+        <div id="quiz-view" class="page-view">
+            <section class="quiz-section">
+                <div class="section-header">
+                    <h2 class="section-title">Test: Ansia o Panico?</h2>
+                    <p class="section-subtitle">Rispondi a 5 rapide domande per comprendere meglio il tuo stato emotivo
+                        attuale.</p>
+                </div>
+
+                <div class="quiz-container card-prevention">
+                    <!-- Schermata Iniziale del Quiz -->
+                    <div id="quiz-intro" class="quiz-step-panel">
+                        <div class="quiz-intro-icon">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                style="width: 48px; height: 48px; color: var(--accent-color);">
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                            </svg>
+                        </div>
+                        <h3>Pronto a capire i tuoi sintomi?</h3>
+                        <p>Questo test ti aiuterà a riconoscere se quello che stai provando assomiglia di più a un
+                            attacco d'ansia o a un attacco di panico, suggerendoti le migliori tecniche per ritrovare il
+                            controllo.</p>
+                        <button class="btn btn-primary btn-large" id="startQuizBtn" style="margin-top: 1.5rem;">Inizia
+                            il Test</button>
+                    </div>
+
+                    <!-- Schermate delle Domande (Dinamiche) -->
+                    <div id="quiz-question-wrapper" class="quiz-step-panel" style="display: none;">
+                        <div class="quiz-progress-bar-wrapper">
+                            <div class="quiz-progress-bar" id="quizProgressBar"></div>
+                        </div>
+                        <div class="quiz-step-info" id="quizStepInfo">Domanda 1 di 5</div>
+                        <h3 class="quiz-question-text" id="quizQuestionText">Testo della domanda</h3>
+
+                        <div class="quiz-options-list">
+                            <button class="quiz-option-btn" id="optionABtn">
+                                <span class="option-letter">A</span>
+                                <span class="option-text" id="optionAText">Opzione A</span>
+                            </button>
+                            <button class="quiz-option-btn" id="optionBBtn">
+                                <span class="option-letter">B</span>
+                                <span class="option-text" id="optionBText">Opzione B</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Schermata del Risultato -->
+                    <div id="quiz-result" class="quiz-step-panel" style="display: none;">
+                        <div class="quiz-result-header">
+                            <div class="quiz-result-badge" id="quizResultBadge">Risultato</div>
+                            <h3 id="quizResultTitle">Attacco di Panico</h3>
+                        </div>
+                        <p class="quiz-result-desc" id="quizResultDesc">
+                            Descrizione del risultato.
+                        </p>
+
+                        <div class="quiz-result-advice card-prevention"
+                            style="margin-top: 1.8rem; padding: 1.5rem; text-align: left; background: rgba(250, 248, 255, 0.02); width: 100%;">
+                            <h4 style="color: var(--color-white); font-size: 1.05rem; font-weight: 700;">💡 Esercizi
+                                consigliati da provare subito:</h4>
+                            <ul class="prevention-list" id="quizResultAdviceList"
+                                style="margin-top: 1.2rem; display: flex; flex-direction: column; gap: 1rem;">
+                                <!-- Riempito dinamico -->
+                            </ul>
+                        </div>
+
+                        <div class="quiz-result-actions"
+                            style="margin-top: 2.5rem; display: flex; gap: 1.2rem; width: 100%;">
+                            <button class="btn btn-secondary flex-1" id="restartQuizBtn">Ripeti il Test</button>
+                            <button class="btn btn-primary flex-1" id="goToExercisesBtn">Vai agli Esercizi</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Vista Test Plushie: Quale Peluche Sei? -->
+        <div id="plush-quiz-view" class="page-view">
+            <section class="quiz-section">
+                <div class="section-header">
+                    <h2 class="section-title">Test: Che Peluche Laska sei?</h2>
+                    <p class="section-subtitle">Rispondi a poche semplici domande sulle tue abitudini, paure e
+                        inclinazioni per scoprire il tuo compagno di rilassamento perfetto.</p>
+                </div>
+
+                <div class="quiz-container card-prevention">
+                    <!-- Schermata Iniziale del Quiz -->
+                    <div id="plush-quiz-intro" class="quiz-step-panel">
+                        <div class="quiz-intro-icon">
+                            <span style="font-size: 3.5rem;">🧸</span>
+                        </div>
+                        <h3>Trova la tua anima affine</h3>
+                        <p>Ogni peluche Laska possiede caratteristiche uniche progettate per calmare specifiche
+                            manifestazioni di ansia e stress. Rispondi sinceramente a queste domande per scoprire quale
+                            Laska risuona con la tua energia.</p>
+                        <button class="btn btn-primary btn-large" id="startPlushQuizBtn"
+                            style="margin-top: 1.5rem;">Inizia il Test</button>
+                    </div>
+
+                    <!-- Schermate delle Domande (Dinamiche) -->
+                    <div id="plush-quiz-question-wrapper" class="quiz-step-panel" style="display: none;">
+                        <div class="quiz-progress-bar-wrapper">
+                            <div class="quiz-progress-bar" id="plushQuizProgressBar"></div>
+                        </div>
+                        <div class="quiz-step-info" id="plushQuizStepInfo">Domanda 1 di 5</div>
+                        <h3 class="quiz-question-text" id="plushQuizQuestionText">Testo della domanda</h3>
+
+                        <div class="quiz-options-list">
+                            <button class="quiz-option-btn" id="plushOptionABtn">
+                                <span class="option-letter">A</span>
+                                <span class="option-text" id="plushOptionAText">Opzione A</span>
+                            </button>
+                            <button class="quiz-option-btn" id="plushOptionBBtn">
+                                <span class="option-letter">B</span>
+                                <span class="option-text" id="plushOptionBText">Opzione B</span>
+                            </button>
+                            <button class="quiz-option-btn" id="plushOptionCBtn">
+                                <span class="option-letter">C</span>
+                                <span class="option-text" id="plushOptionCText">Opzione C</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Schermata del Risultato -->
+                    <div id="plush-quiz-result" class="quiz-step-panel" style="display: none; align-items: center;">
+                        <div class="quiz-result-header" style="margin-bottom: 1.5rem;">
+                            <div class="quiz-result-badge" id="plushQuizResultBadge">Il tuo compagno ideale</div>
+                            <h3 id="plushQuizResultTitle" style="font-size: 1.8rem; margin-top: 0.5rem;">Orsetto Lavanda
+                            </h3>
+                        </div>
+
+                        <!-- Plushie Match Display Card -->
+                        <div class="plush-match-card"
+                            style="display: flex; flex-direction: column; align-items: center; gap: 1.5rem; margin-bottom: 2rem; background: rgba(53, 66, 79, 0.02); border: 1px solid var(--panel-border); border-radius: var(--border-radius-medium); padding: 2rem; width: 100%; text-align: center;">
+                            <img id="plushQuizResultImg" src="assets/plush_lavender.png" alt="Plushie Match" class="interactive-plush"
+                                style="max-height: 200px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.1));">
+                            <p class="quiz-result-desc" id="plushQuizResultDesc"
+                                style="margin-bottom: 0; font-size: 0.95rem; line-height: 1.6;">
+                                Descrizione personalizzata del risultato in base alle risposte.
+                            </p>
+                        </div>
+
+                        <div class="quiz-result-actions"
+                            style="margin-top: 1rem; display: flex; gap: 1.2rem; width: 100%;">
+                            <button class="btn btn-secondary flex-1" id="restartPlushQuizBtn">Ripeti il Test</button>
+                            <button class="btn btn-primary flex-1" id="adoptPlushBtn">Adotta il tuo Laska</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Vista Esercizio Singolo (Focus Mode) -->
+        <div id="exercise-view" class="page-view">
+            <section class="exercise-focus-section">
+                <!-- Header del Focus Mode -->
+                <div class="exercise-focus-header">
+                    <button class="back-to-home-btn" id="backToExercisesBtn">
+                        <span class="back-arrow">←</span> Torna agli Esercizi
+                    </button>
+                </div>
+
+                <div class="exercise-focus-container">
+
+                    <!-- Pannello Esercizio 1: Ascolta il battito -->
+                    <div class="exercise-focus-panel" id="focus-panel-1">
+                        <div class="focus-panel-info">
+                            <div class="exercise-badge">Esercizio 1</div>
+                            <h2 class="focus-title">Ascolta il battito</h2>
+                            <p class="focus-desc">Segui il ritmo del cuore pulsante. Sincronizza il tuo respiro con la
+                                sua pulsazione lenta e naturale.</p>
+                        </div>
+                        <div class="exercise-visual visual-rhythm">
+                            <!-- Modello 3D heart_in_love.glb al posto dei cerchi di respirazione -->
+                            <div class="breathing-heart-3d-container">
+                                <model-viewer id="rhythmHeartViewer" src="heart_in_love.glb" scale="0.6 0.6 0.6"
+                                    alt="Modello 3D di un cuore per respirazione" auto-rotate auto-rotate-delay="0"
+                                    rotation-per-second="10deg" camera-controls interaction-prompt="none"
+                                    shadow-intensity="0" shadow-softness="0.8" environment-image="neutral"
+                                    exposure="1.0" disable-zoom aria-label="Modello 3D del cuore respirante">
+                                </model-viewer>
+                            </div>
+                            <span class="breathing-guide-text" id="rhythmText">Inspira...</span>
+                        </div>
+                    </div>
+
+                    <!-- Pannello Esercizio 2: Torna al presente (Grounding) -->
+                    <div class="exercise-focus-panel" id="focus-panel-2">
+                        <div class="focus-panel-info">
+                            <div class="exercise-badge">Esercizio 2</div>
+                            <h2 class="focus-title">Torna al presente</h2>
+                            <p class="focus-desc">Un esercizio interattivo di radicamento. Concentrati su ciò che ti
+                                circonda passo dopo passo.</p>
+                        </div>
+                        <div class="exercise-visual visual-grounding" id="groundingContainer">
+                            <div class="grounding-step-active" id="groundingStepContent">
+                                <div class="grounding-icon-wrapper" id="groundingIcon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        style="width: 24px; height: 24px;">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                </div>
+                                <h4 id="groundingStepInstruction">Nomina 5 cose che puoi VEDERE</h4>
+
+                                <div class="grounding-tags" id="groundingTags">
+                                    <!-- I tag inseriti appariranno qui -->
+                                </div>
+
+                                <div class="grounding-input-group">
+                                    <input type="text" id="groundingInput"
+                                        placeholder="Digita qualcosa e premi Invio..." autocomplete="off">
+                                    <button class="btn btn-secondary btn-small" id="groundingAddBtn">Aggiungi</button>
+                                </div>
+
+                                <div class="grounding-progress">
+                                    Elementi: <span id="groundingCurrentCount">0</span> di <span
+                                        id="groundingTargetCount">5</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-block" id="groundingNextBtn"
+                                style="display: none;">Ricomincia</button>
+                        </div>
+                    </div>
+
+                    <!-- Pannello Esercizio 3: Respirazione quadrata -->
+                    <div class="exercise-focus-panel" id="focus-panel-3">
+                        <div class="focus-panel-info">
+                            <div class="exercise-badge">Esercizio 3</div>
+                            <h2 class="focus-title">Respirazione quadrata</h2>
+                            <p class="focus-desc">Un ciclo di quattro fasi per stabilizzare il sistema nervoso. Segui la
+                                linea luminosa.</p>
+                        </div>
+                        <div class="exercise-visual visual-box">
+                            <div class="box-breathing-container">
+                                <svg class="box-svg" viewBox="0 0 120 120">
+                                    <!-- Sfondo del quadrato -->
+                                    <rect class="box-bg-rect" x="10" y="10" width="100" height="100" rx="12"></rect>
+                                    <!-- Linea attiva animata -->
+                                    <rect class="box-anim-rect" id="boxLine" x="10" y="10" width="100" height="100"
+                                        rx="12"></rect>
+                                </svg>
+                                <div class="box-phase-label" id="boxPhaseText">Pronto</div>
+                                <div class="box-timer" id="boxTimer">4s</div>
+                            </div>
+                            <button class="btn btn-primary" id="boxBreathingBtn">Avvia Esercizio</button>
+                        </div>
+                    </div>
+
+                    <!-- Pannello Esercizio 4: Rilassa i muscoli -->
+                    <div class="exercise-focus-panel" id="focus-panel-4">
+                        <div class="focus-panel-info">
+                            <div class="exercise-badge">Esercizio 4</div>
+                            <h2 class="focus-title">Rilassa i muscoli</h2>
+                            <p class="focus-desc">Alterna tensione e rilassamento per rilasciare lo stress fisico
+                                accumulato nel corpo.</p>
+                        </div>
+                        <div class="exercise-visual visual-relaxation" id="relaxationVisualContainer">
+                            <div class="hand-svg-wrapper">
+                                <!-- SVG Mano minimalista con entrambi gli stati in sovrapposizione per cross-fade -->
+                                <svg class="hand-svg" viewBox="0 0 100 100">
+                                    <g class="hand-glow-layer" id="handGlow"></g>
+                                    <!-- Stato Mano Aperta (Rilassata) -->
+                                    <g class="hand-state-open" id="handOpenState">
+                                        <path
+                                            d="M50,75 C45,75 35,70 35,55 L35,45 C35,43 36,42 38,42 C40,42 41,43 41,45 L41,30 C41,28 42,27 44,27 C46,27 47,28 47,30 L47,22 C47,20 48,19 50,19 C52,19 53,20 53,22 L53,28 C53,26 54,25 56,25 C58,25 59,26 59,28 L59,35 C59,34 60,33 62,33 C64,33 65,34 65,36 L65,55 C65,70 55,75 50,75 Z"
+                                            class="hand-path" />
+                                        <!-- Pollice aperto -->
+                                        <path d="M36,58 C33,57 28,52 25,48 C24,47 25,45 27,45 C29,45 32,48 35,52"
+                                            class="hand-path" />
+                                    </g>
+                                    <!-- Stato Pugno Chiuso (Teso) -->
+                                    <g class="hand-state-fist" id="handFistState">
+                                        <!-- Palmo chiuso -->
+                                        <path
+                                            d="M50,75 C45,75 35,70 35,55 L35,48 C35,46 36,45 38,45 C40,45 41,46 41,48 L41,42 C41,40 42,39 44,39 C46,39 47,40 47,42 L47,39 C47,37 48,36 50,36 C52,36 53,37 53,39 L53,42 C53,40 54,39 56,39 C58,39 59,40 59,42 L59,45 C59,44 60,43 62,43 C64,43 65,44 65,46 L65,55 C65,70 55,75 50,75 Z"
+                                            class="hand-path" />
+                                        <!-- Dita piegate che stringono -->
+                                        <path d="M38,45 C38,50 43,52 45,52" class="hand-path" />
+                                        <path d="M44,42 C44,48 49,50 51,50" class="hand-path" />
+                                        <path d="M50,42 C50,48 55,50 57,50" class="hand-path" />
+                                        <path d="M56,42 C56,48 61,50 63,50" class="hand-path" />
+                                        <!-- Pollice che chiude sopra le dita -->
+                                        <path d="M32,56 C35,54 42,50 46,50 C48,50 49,52 47,54 C45,56 38,62 35,62"
+                                            class="hand-path thumb-fist" />
+                                    </g>
+                                </svg>
+                            </div>
+                            <span class="relaxation-text" id="relaxationText">Pronto</span>
+                        </div>
+                        <div class="relaxation-actions" style="margin-top: 1rem; width: 100%;">
+                            <button class="btn btn-primary btn-block" id="relaxationBtn">Avvia Esercizio</button>
+                        </div>
+                    </div>
+
+                    <!-- Pannello Esercizio 5: Terapia del suono -->
+                    <div class="exercise-focus-panel" id="focus-panel-5">
+                        <div class="focus-panel-info">
+                            <div class="exercise-badge">Esercizio 5</div>
+                            <h2 class="focus-title">Terapia del suono</h2>
+                            <p class="focus-desc">Ascolta paesaggi sonori e frequenze terapeutiche sintetizzate per
+                                calmare la mente.</p>
+                        </div>
+                        <div class="exercise-visual visual-sound">
+                            <div class="sound-controls-wrapper">
+                                <label for="soundSelect" class="sound-label">Scegli il suono:</label>
+                                <select id="soundSelect" class="sound-select">
+                                    <option value="ocean">Onde dell'Oceano</option>
+                                    <option value="rain">Pioggia Rilassante</option>
+                                    <option value="binaural">Frequenza Theta (6Hz)</option>
+                                    <option value="bowl">Campana Tibetana</option>
+                                </select>
+
+                                <!-- Visualizzatore di onde sonore animato (CSS) -->
+                                <div class="sound-wave-visualizer" id="soundVisualizer">
+                                    <span class="bar bar-1"></span>
+                                    <span class="bar bar-2"></span>
+                                    <span class="bar bar-3"></span>
+                                    <span class="bar bar-4"></span>
+                                    <span class="bar bar-5"></span>
+                                </div>
+                            </div>
+                            <div class="sound-actions">
+                                <button class="btn btn-primary btn-block" id="soundPlayBtn">Ascolta</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pannello Esercizio 6: Respiro profondo -->
+                    <div class="exercise-focus-panel" id="focus-panel-6">
+                        <div class="focus-panel-info">
+                            <div class="exercise-badge">Esercizio 6</div>
+                            <h2 class="focus-title">Respiro profondo</h2>
+                            <p class="focus-desc">Riduci lo stress con la respirazione diaframmatica (5-2-5). Segui il
+                                cerchio luminoso.</p>
+                        </div>
+                        <div class="exercise-visual visual-deep-breath" id="deepBreathContainer">
+                            <div class="deep-breath-circle-wrapper">
+                                <div class="deep-breath-circle" id="deepBreathCircle"></div>
+                            </div>
+                            <div class="deep-breath-phase" id="deepBreathPhase">Pronto</div>
+                            <div class="deep-breath-timer" id="deepBreathTimer">5s</div>
+                        </div>
+                        <div class="deep-breath-actions" style="margin-top: 1rem; width: 100%;">
+                            <button class="btn btn-primary btn-block" id="deepBreathBtn">Avvia Esercizio</button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+        <!-- Vista Dettaglio Prodotto (Personalizzazione) -->
+        <div id="product-detail-view" class="page-view">
+            <section class="product-detail-section">
+                <!-- Bottone Indietro -->
+                <div class="product-detail-header">
+                    <button class="back-to-home-btn" id="backToPlushBtn">
+                        <span class="back-arrow">←</span> Torna ai Peluche
+                    </button>
+                </div>
+
+                <div class="product-detail-container">
+                    <!-- Colonna Sinistra: Anteprima Immagine Dinamica -->
+                    <div class="detail-visual-column">
+                        <div class="detail-img-container">
+                            <img src="assets/plush_lavender.png" alt="Anteprima Peluche" id="detailProductImg" class="interactive-plush">
+                        </div>
+                    </div>
+
+                    <!-- Colonna Destra: Configurazione e Info -->
+                    <div class="detail-info-column">
+                        <div class="detail-badge">Peluche Terapeutico</div>
+                        <h2 class="detail-title" id="detailProductName">Orsetto Lavanda</h2>
+                        <div class="detail-price" id="detailProductPrice">34,90 €</div>
+                        <p class="detail-desc" id="detailProductDesc">Descrizione del peluche...</p>
+
+                        <hr class="detail-divider">
+
+
+
+                        <!-- Quantità e Azione -->
+                        <div class="config-group quantity-cart-row">
+                            <div class="quantity-selector-wrapper">
+                                <label class="config-label" for="detailQty">Quantità:</label>
+                                <div class="quantity-input-group">
+                                    <button class="qty-btn" id="qtyMinusBtn" type="button">-</button>
+                                    <input type="number" id="detailQty" value="1" min="1" max="10" readonly>
+                                    <button class="qty-btn" id="qtyPlusBtn" type="button">+</button>
+                                </div>
+                            </div>
+
+                            <div class="total-price-display-wrapper">
+                                <div class="config-label">Prezzo Totale:</div>
+                                <div class="detail-total-price" id="detailTotalPrice">34,90 €</div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary btn-large btn-block" id="addToCartBtn" style="gap: 10px;">
+                            Aggiungi al Carrello
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" style="font-size: 1.2rem;">
+                                <circle cx="9" cy="21" r="1" />
+                                <circle cx="20" cy="21" r="1" />
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Vista Successo Ordine -->
+        <div id="success-view" class="page-view">
+            <section class="success-section">
+                <div class="success-card card-prevention">
+                    <div class="success-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="width: 48px; height: 48px; color: var(--accent-color);">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                            <polyline points="22 4 12 14.01 9 11.01" />
+                        </svg>
+                    </div>
+                    <h2 class="success-title">Ordine Ricevuto!</h2>
+                    <p class="success-subtitle">Grazie per aver acquistato i peluche Laska. La tua richiesta è in
+                        elaborazione.</p>
+
+                    <hr class="success-divider">
+
+                    <div class="order-details-box">
+                        <h3>Dettagli dell'Ordine:</h3>
+                        <div id="successOrderItems" class="success-order-items">
+                            <!-- Inseriti da JS -->
+                        </div>
+                        <div class="success-totals">
+                            <span>Totale Pagato:</span>
+                            <strong id="successTotalPaid">0,00 €</strong>
+                        </div>
+                    </div>
+
+                    <p class="success-notice">Ti abbiamo inviato un'email di conferma con i dettagli della spedizione.
+                    </p>
+
+                    <button class="btn btn-primary btn-large" id="successHomeBtn">Torna alla Home</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- Vista Stanza della Calma (Rain Video Room) -->
+        <div id="room-view" class="page-view">
+            <div class="room-video-wrapper">
+                <video id="roomVideo" src="camera pioggia.mp4" loop playsinline autoplay muted></video>
+
+                <div class="video-controls-overlay">
+                    <button class="video-control-btn" id="roomBackBtn" aria-label="Esci dalla Stanza"
+                        title="Esci dalla Stanza (Torna alla Home)">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                            <polyline points="9 22 9 12 15 12 15 22" />
+                        </svg>
+                    </button>
+
+                    <button class="video-control-btn" id="videoPlayPauseBtn" aria-label="Play/Pausa" title="Play/Pausa">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="6" y="4" width="4" height="16"></rect>
+                            <rect x="14" y="4" width="4" height="16"></rect>
+                        </svg>
+                    </button>
+
+                    <button class="video-control-btn" id="roomRainBtn" aria-label="Suono Pioggia" title="Suono Pioggia">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="16" y1="13" x2="16" y2="21"></line>
+                            <line x1="8" y1="13" x2="8" y2="21"></line>
+                            <line x1="12" y1="15" x2="12" y2="23"></line>
+                            <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path>
+                        </svg>
+                    </button>
+
+                    <button class="video-control-btn" id="roomWavesBtn" aria-label="Suono Onde" title="Suono Onde">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M2 6c.6 0 1.2-.2 1.8-.6l3-2.4c1.2-1 3.2-1 4.4 0l3 2.4c1.2 1 3.2 1 4.4 0l3-2.4c.6-.4 1.2-.6 1.8-.6" />
+                            <path
+                                d="M2 12c.6 0 1.2-.2 1.8-.6l3-2.4c1.2-1 3.2-1 4.4 0l3 2.4c1.2 1 3.2 1 4.4 0l3-2.4c.6-.4 1.2-.6 1.8-.6" />
+                            <path
+                                d="M2 18c.6 0 1.2-.2 1.8-.6l3-2.4c1.2-1 3.2-1 4.4 0l3 2.4c1.2 1 3.2 1 4.4 0l3-2.4c.6-.4 1.2-.6 1.8-.6" />
+                        </svg>
+                    </button>
+
+                    <button class="video-control-btn" id="roomBowlBtn" aria-label="Suono Campana" title="Suono Campana">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9z" />
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg>
+                    </button>
+
+                    <button class="video-control-btn" id="roomMountainBtn" aria-label="Montagna" title="Montagna">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3 3 17h18L16 6l-4 6-4-9Z" />
+                        </svg>
+                    </button>
+
+                    <button class="video-control-btn muted" id="videoMuteBtn" aria-label="Muto/Attiva Audio"
+                        title="Spegni Audio">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2026 Laska. Progettato con cura per il benessere emotivo.</p>
+            <p class="footer-disclaimer">Nota: I peluche Laska sono supporti terapeutici di benessere e non
+                sostituiscono il parere di un medico professionista.</p>
+        </footer>
+
+    </main>
+
+    <!-- Pannello Laterale (Menu Hamburger) -->
+    <div class="side-menu" id="sideMenu" aria-hidden="true">
+        <div class="side-menu-overlay" id="sideMenuOverlay"></div>
+        <div class="side-menu-content">
+            <header class="side-menu-header">
+                <h3>Menu</h3>
+                <button class="close-menu-btn" id="closeMenuBtn" aria-label="Chiudi menu">&times;</button>
+            </header>
+
+            <nav class="side-nav">
+                <button class="side-nav-btn active" id="sideNavHomeBtn">
+                    <svg class="icon nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>Home
+                </button>
+                <button class="side-nav-btn" id="sideNavAnxietyBtn">
+                    <svg class="icon nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4M12 8h.01" />
+                    </svg>Vivere con l'Ansia
+                </button>
+                <button class="side-nav-btn" id="sideNavRoomBtn">
+                    <svg class="icon nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>Stanza Calma
+                </button>
+                <button class="side-nav-btn" id="sideNavInfoBtn">
+                    <svg class="icon nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                    </svg>Prevenzione Ansia
+                </button>
+                <button class="side-nav-btn" id="sideNavQuizBtn">
+                    <svg class="icon nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                    </svg>Test Ansia o Panico
+                </button>
+                <button class="side-nav-btn" id="sideNavPlushQuizBtn">
+                    <span class="nav-icon"
+                        style="margin-right: 12px; font-size: 1.1rem; line-height: 1; display: inline-flex; align-items: center; justify-content: center; width: 20px;">🧸</span>Test:
+                    Che Peluche sei?
+                </button>
+            </nav>
+
+            <hr class="side-divider">
+
+            <!-- SEZIONE INFORMAZIONI (Facilmente modificabile) -->
+            <section class="side-info-section">
+                <h4><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="16" x2="12" y2="12" />
+                        <line x1="12" y1="8" x2="12.01" y2="8" />
+                    </svg>Informazioni</h4>
+                <p><strong>Laska</strong> è un progetto dedicato al benessere mentale e al sollievo dallo stress
+                    quotidiano.</p>
+                <p>Realizziamo peluche terapeutici pesati con un cuore pulsante interno simulato che aiuta a regolare il
+                    respiro in modo naturale ed empatico.</p>
+                <p>Il nostro obiettivo è unire la morbidezza del design all'efficacia delle tecniche cognitive di
+                    rilassamento per offrirti un porto sicuro contro l'ansia.</p>
+            </section>
+        </div>
+    </div>
+
+    <!-- Drawer del Carrello (Slide-out da destra) -->
+    <div class="side-menu cart-drawer" id="cartDrawer" aria-hidden="true">
+        <div class="side-menu-overlay" id="cartOverlay"></div>
+        <div class="side-menu-content">
+            <header class="side-menu-header">
+                <h3>Il tuo Carrello</h3>
+                <button class="close-menu-btn" id="closeCartBtn" aria-label="Chiudi carrello">&times;</button>
+            </header>
+
+            <div class="cart-items-container" id="cartItemsList">
+                <div class="cart-empty-message">Il tuo carrello è vuoto.</div>
+            </div>
+
+            <div class="cart-footer-summary" id="cartSummaryBlock" style="display: none;">
+            </div>
+            <button class="btn btn-primary btn-block" id="checkoutBtn" style="margin-top: 1.5rem; gap: 8px;">
+                Procedi all'Acquisto
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                    <line x1="1" y1="10" x2="23" y2="10" />
+                </svg>
+            </button>
+        </div>
+    </div>
+    </div>
+
+    <!-- Modal di Checkout -->
+    <div class="checkout-modal-wrapper" id="checkoutModal" style="display: none;">
+        <div class="checkout-modal-overlay" id="checkoutModalOverlay"></div>
+        <div class="checkout-modal-content card-prevention">
+            <header class="checkout-header">
+                <h3>Completa il tuo Ordine</h3>
+                <button class="close-modal-btn" id="closeCheckoutBtn">&times;</button>
+            </header>
+
+            <form id="checkoutForm" class="checkout-form">
+                <!-- Informazioni Spedizione -->
+                <div class="form-section-title" style="display: flex; align-items: center; gap: 8px;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                        <line x1="12" y1="22.08" x2="12" y2="12" />
+                    </svg>
+                    Spedizione & Contatti
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label for="checkoutName">Nome e Cognome</label>
+                        <input type="text" id="checkoutName" required placeholder="Mario Rossi">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label for="checkoutEmail">Email</label>
+                        <input type="email" id="checkoutEmail" required placeholder="mario.rossi@example.com">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="checkoutAddress">Indirizzo di Spedizione</label>
+                    <input type="text" id="checkoutAddress" required placeholder="Via della Calma 12, 00100 Roma">
+                </div>
+
+                <!-- Dati Pagamento -->
+                <div class="form-section-title" style="display: flex; align-items: center; gap: 8px;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                        <line x1="1" y1="10" x2="23" y2="10" />
+                    </svg>
+                    Pagamento (Simulato)
+                </div>
+
+                <div class="form-group">
+                    <label for="checkoutCard">Numero di Carta</label>
+                    <input type="text" id="checkoutCard" required placeholder="4000 1234 5678 9010" maxlength="19">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label for="checkoutExpiry">Scadenza</label>
+                        <input type="text" id="checkoutExpiry" required placeholder="MM/AA" maxlength="5">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label for="checkoutCvv">CVV</label>
+                        <input type="text" id="checkoutCvv" required placeholder="123" maxlength="3">
+                    </div>
+                </div>
+
+                <div class="checkout-totals-summary">
+                    <span>Totale da Pagare:</span>
+                    <strong id="checkoutTotalVal">0,00 €</strong>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-large" style="gap: 8px;">
+                    Conferma Pagamento ed Ordina
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Pulsante Fluttuante Chat (Phase 3) -->
+    <button class="chat-floating-btn" id="chatFloatingBtn" aria-label="Parla con Laska" title="Parla con Laska">
+        <span class="chat-floating-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg></span>
+        <span class="chat-floating-pulse"></span>
+    </button>
+
+    <!-- Emotional Chat Bottom Drawer (Phase 3) -->
+    <div class="chat-drawer" id="chatDrawer">
+        <div class="chat-drawer-overlay" id="chatDrawerOverlay"></div>
+        <div class="chat-drawer-content">
+            <header class="chat-drawer-header">
+                <div class="chat-header-info">
+                    <div class="chat-avatar">🐰</div>
+                    <div class="chat-title-status">
+                        <h4 id="chatDrawerTitle">Laska ti ascolta</h4>
+                        <span class="chat-status"><span class="chat-status-dot"></span>In ascolto</span>
+                    </div>
+                </div>
+                <button class="chat-close-btn" id="closeChatDrawerBtn" aria-label="Chiudi chat">&times;</button>
+            </header>
+
+            <!-- Message area -->
+            <div class="chat-messages-area" id="chatDrawerMessages">
+                <!-- Initial message dynamically loaded -->
+            </div>
+
+            <!-- Form for message inputs -->
+            <form id="chatDrawerForm" class="chat-input-form">
+                <input type="text" id="chatDrawerInput" placeholder="Raccontagli qualcosa..." autocomplete="off"
+                    maxlength="150" required>
+                <button type="submit" class="chat-send-btn" id="chatDrawerSendBtn" aria-label="Invia">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script JavaScript -->
+    <script src="app.js?v=20260904"></script>
+</body>
+
+</html>
