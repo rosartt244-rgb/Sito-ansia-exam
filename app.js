@@ -15,666 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const plushWrapper = document.getElementById('plushWrapper');
     const plushFloatingName = document.getElementById('plushFloatingName');
     
-    // Gestione Schermata Iniziale (Splash Screen - Sequenza 3 video + Carousel)
-    const splashScreen = document.getElementById('splash-screen');
-    const splashVideo = document.getElementById('splashVideo');
-    const splashVideo2 = document.getElementById('splashVideo2');
-    const splashVideo3 = document.getElementById('splashVideo3');
-    const splashVideo4 = document.getElementById('splashVideo4');
-    const splashVideo5 = document.getElementById('splashVideo5');
-    const splashVideo6 = document.getElementById('splashVideo6');
-    const splashVideo7 = document.getElementById('splashVideo7');
-    const splashVideo8 = document.getElementById('splashVideo8');
-    const splashVideo9 = document.getElementById('splashVideo9');
+    // L'introduzione ora è in onboarding.js (scene in HTML/CSS/SVG, niente video).
+    // Qui teniamo solo l'animale scelto, usato dall'immagine del peluche nell'hero.
+    let selectedAnimal = 'peluche';
 
-    let currentSplashStep = 1;
-    let selectedAnimal = 'orso';
-
-    const prevBtn = document.getElementById('splashPrevBtn');
-    const nextBtn = document.getElementById('splashNextBtn');
-
-    if (prevBtn) {
-        prevBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            goToSplashStep(currentSplashStep - 1);
-        });
-    }
-
-    if (nextBtn) {
-        nextBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            goToSplashStep(currentSplashStep + 1);
-        });
-    }
-
-    const skipBtn = document.getElementById('skipCustomizationBtn');
-    if (skipBtn) {
-        skipBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dismissSplash();
-        });
-    }
-
-    const helpMeBtn = document.getElementById('helpMeBtn');
-    if (helpMeBtn) {
-        helpMeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            // Mostra il video Aiutami.mov
-            goToSplashStep(9);
-        });
-    }
-
-    const goAheadBtn = document.getElementById('goAheadBtn');
-    if (goAheadBtn) {
-        goAheadBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            // Vai avanti → salta e entra nel sito
-            dismissSplash();
-        });
-    }
-
-    function updateNavButtons(step) {
-        if (prevBtn) prevBtn.style.display = step > 1 ? 'flex' : 'none';
-        if (nextBtn) nextBtn.style.display = step < 10 ? 'flex' : 'none';
-    }
-
-    function goToSplashStep(stepNumber) {
-        if (stepNumber < 1) return;
-        if (stepNumber > 9) {
-            dismissSplash();
-            return;
-        }
-
-        currentSplashStep = stepNumber;
-        updateNavButtons(stepNumber);
-
-        // Reset all videos
-        const videos = [splashVideo, splashVideo2, splashVideo3, splashVideo4, splashVideo5, splashVideo6, splashVideo7, splashVideo8, splashVideo9];
-        videos.forEach(v => {
-            if (v) {
-                v.pause();
-                v.style.display = 'none';
-                v.currentTime = 0;
-            }
-        });
-
-        // Hide all carousels/overlays
-        const elements = ['plushCarousel', 'colorCarousel', 'heartCarousel', 'coniglioAnsiaSub', 'skipCustomizationBtn', 'helpMeBtn', 'goAheadBtn', 'breathingExercise', 'breathingSuccess'];
-        elements.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.display = 'none';
-        });
-
-        // Clear subtitle timeouts
-        if (window.subtitleTimeout1) clearTimeout(window.subtitleTimeout1);
-        if (window.subtitleTimeout2) clearTimeout(window.subtitleTimeout2);
-        if (window.subtitleTimeout3) clearTimeout(window.subtitleTimeout3);
-        if (window.breathingInterval) clearInterval(window.breathingInterval);
-        if (window.breathingTimeout) clearTimeout(window.breathingTimeout);
-        if (window.successTimeout) clearTimeout(window.successTimeout);
-        stopTachycardiaSound();
-
-        const activeVideo = videos[stepNumber - 1];
-        if (activeVideo) {
-            activeVideo.style.display = 'block';
-            activeVideo.loop = (stepNumber === 3 || stepNumber === 4 || stepNumber === 5 || stepNumber === 9);
-            activeVideo.play().catch(e => console.log(`Autoplay video ${stepNumber} bloccato:`, e));
-        }
-
-        if (stepNumber === 2) {
-            const skipBtn = document.getElementById('skipCustomizationBtn');
-            if (skipBtn) skipBtn.style.display = 'block';
-        } else if (stepNumber === 3) {
-            showPlushCarousel();
-        } else if (stepNumber === 4) {
-            showColorCarousel(selectedAnimal);
-        } else if (stepNumber === 5) {
-            showHeartCarousel();
-        } else if (stepNumber === 7 || stepNumber === 8) {
-            startTachycardiaSound();
-            if (stepNumber === 8) {
-                const subtitle = document.getElementById('coniglioAnsiaSub');
-                const helpBtn = document.getElementById('helpMeBtn');
-                const goBtn = document.getElementById('goAheadBtn');
-                if (subtitle) {
-                    subtitle.textContent = "Shh... Lily sta facendo un brutto sogno.";
-                    subtitle.style.display = 'block';
-                    subtitle.style.opacity = '1';
-                    
-                    window.subtitleTimeout1 = setTimeout(() => {
-                        subtitle.style.transition = 'opacity 0.5s ease';
-                        subtitle.style.opacity = '0';
-                        
-                        window.subtitleTimeout2 = setTimeout(() => {
-                            subtitle.textContent = "puoi aiutarla a trovare la calma?";
-                            subtitle.style.opacity = '1';
-                            
-                            // Mostra i bottoni dopo la seconda frase
-                            window.subtitleTimeout3 = setTimeout(() => {
-                                if (helpBtn) helpBtn.style.display = 'block';
-                                if (goBtn) goBtn.style.display = 'block';
-                            }, 800);
-                        }, 500);
-                    }, 3000);
-                }
-            }
-        } else if (stepNumber === 9) {
-            const exerciseContainer = document.getElementById('breathingExercise');
-            const circle = document.getElementById('breathingCircle');
-            const text = document.getElementById('breathingText');
-            const success = document.getElementById('breathingSuccess');
-            
-            if (exerciseContainer && circle && text) {
-                exerciseContainer.style.display = 'block';
-                
-                // Initialize state
-                circle.style.transform = 'scale(1)';
-                text.textContent = 'Inspira...';
-                
-                // Trigger first breath in slightly after display
-                setTimeout(() => {
-                    circle.style.transform = 'scale(1.8)';
-                }, 100);
-
-                let isInspiring = true;
-                let cycles = 0;
-                
-                window.breathingInterval = setInterval(() => {
-                    isInspiring = !isInspiring;
-                    cycles++;
-                    
-                    if (isInspiring) {
-                        text.textContent = 'Inspira...';
-                        circle.style.transform = 'scale(1.8)';
-                    } else {
-                        text.textContent = 'Espira...';
-                        circle.style.transform = 'scale(1)';
-                    }
-                    
-                    // Stop after 4 phases (Inspira, Espira, Inspira, Espira)
-                    if (cycles >= 3) {
-                        clearInterval(window.breathingInterval);
-                        window.breathingTimeout = setTimeout(() => {
-                            exerciseContainer.style.display = 'none';
-                            if (success) {
-                                success.style.display = 'block';
-                                window.successTimeout = setTimeout(() => {
-                                    dismissSplash();
-                                }, 3000);
-                            }
-                        }, 4000);
-                    }
-                }, 4000);
-            }
-        }
-
-        // Set natural ended listeners
-        if (activeVideo) {
-            activeVideo.onended = () => {
-                goToSplashStep(stepNumber + 1);
-            };
-        }
-    }
-
-    function playColorBaseVideo(animal = 'orso') {
-        selectedAnimal = animal;
-        goToSplashStep(4);
-    }
-
-    function playHeartChoiceVideo() {
-        goToSplashStep(5);
-    }
-
-    function playNameChoiceVideo() {
-        goToSplashStep(6);
-    }
-
-    function playHeartbeatVideo() {
-        goToSplashStep(7);
-    }
-
-    function playConiglioAnsiaVideo() {
-        goToSplashStep(8);
-    }
-
-    function showHeartCarousel() {
-        const heartCarousel = document.getElementById('heartCarousel');
-        if (!heartCarousel) return;
-        heartCarousel.style.display = 'flex';
-        initHeartCarousel();
-    }
-
-    function initHeartCarousel() {
-        const viewport = document.getElementById('heartCarouselViewport');
-        const track = document.getElementById('heartCarouselTrack');
-        const dots = document.querySelectorAll('#heartCarouselDots .carousel-dot');
-        const slides = document.querySelectorAll('#heartCarouselTrack .carousel-slide');
-        if (!viewport || !track || slides.length === 0) return;
-
-        let currentIdx = 0;
-        let startX = 0;
-        let isDragging = false;
-        let dragDelta = 0;
-
-        function getSlideWidth() {
-            return slides[0].offsetWidth;
-        }
-
-        function getViewportWidth() {
-            return viewport.offsetWidth;
-        }
-
-        function getBaseOffset(index) {
-            const viewportWidth = getViewportWidth();
-            const slideWidth = getSlideWidth();
-            return (viewportWidth - slideWidth) / 2 - index * slideWidth;
-        }
-
-        function goToSlide(index, animate) {
-            if (index < 0) index = 0;
-            if (index >= slides.length) index = slides.length - 1;
-            currentIdx = index;
-            const offset = getBaseOffset(currentIdx);
-            track.style.transition = animate
-                ? 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)'
-                : 'none';
-            track.style.transform = `translateX(${offset}px)`;
-
-            dots.forEach((d, i) => d.classList.toggle('active', i === currentIdx));
-            slides.forEach((s, i) => s.classList.toggle('active', i === currentIdx));
-        }
-
-        function onDragStart(x) {
-            isDragging = true;
-            startX = x;
-            dragDelta = 0;
-            track.style.transition = 'none';
-        }
-
-        function onDragMove(x) {
-            if (!isDragging) return;
-            dragDelta = x - startX;
-            const base = getBaseOffset(currentIdx);
-            let translate = base + dragDelta;
-            if (currentIdx === 0 && dragDelta > 0) translate = base + dragDelta * 0.3;
-            if (currentIdx === slides.length - 1 && dragDelta < 0) translate = base + dragDelta * 0.3;
-            track.style.transform = `translateX(${translate}px)`;
-        }
-
-        function onDragEnd() {
-            if (!isDragging) return;
-            isDragging = false;
-
-            // Se il movimento è minimo, è un tap → seleziona cuore e passa alla scelta nome
-            if (Math.abs(dragDelta) < 8) {
-                const heartCarousel = document.getElementById('heartCarousel');
-                if (heartCarousel) heartCarousel.style.display = 'none';
-                playNameChoiceVideo();
-                return;
-            }
-
-            const threshold = getSlideWidth() * 0.3;
-            if (dragDelta < -threshold && currentIdx < slides.length - 1) {
-                currentIdx++;
-            } else if (dragDelta > threshold && currentIdx > 0) {
-                currentIdx--;
-            }
-            goToSlide(currentIdx, true);
-        }
-
-        viewport.addEventListener('touchstart', (e) => onDragStart(e.touches[0].clientX), { passive: true });
-        viewport.addEventListener('touchmove', (e) => {
-            if (isDragging) {
-                e.preventDefault();
-                onDragMove(e.touches[0].clientX);
-            }
-        }, { passive: false });
-        viewport.addEventListener('touchend', onDragEnd);
-
-        viewport.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            onDragStart(e.clientX);
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) onDragMove(e.clientX);
-        });
-        document.addEventListener('mouseup', () => {
-            if (isDragging) onDragEnd();
-        });
-
-        dots.forEach(dot => {
-            dot.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const target = parseInt(dot.dataset.index);
-                if (target !== currentIdx) {
-                    goToSlide(target, true);
-                }
-            });
-        });
-
-        goToSlide(currentIdx, false);
-    }
-
-    function showColorCarousel(animal) {
-        const colorCarousel = document.getElementById('colorCarousel');
-        const colorTrack = document.getElementById('colorCarouselTrack');
-        const colorDots = document.getElementById('colorCarouselDots');
-        if (!colorCarousel || !colorTrack || !colorDots) return;
-
-        let options = [];
-        if (animal === 'orso') {
-            options = [
-                { name: 'Beige', img: 'orso beige.png', dotColor: '#C4B5A0', colorKey: 'crema' },
-                { name: 'Rosa', img: 'orso rosa 2.png', dotColor: '#F8C3DC', colorKey: 'rosa' },
-                { name: 'Azzurro', img: 'orso azzurro.png', dotColor: '#87CEEB', colorKey: 'azzurro' },
-                { name: 'Verde', img: 'orso verde.png', dotColor: '#A8E6CF', colorKey: 'verde' },
-                { name: 'Orso 1', img: 'orso 1.png', dotColor: '#B08B6B', colorKey: 'classico' }
-            ];
-        } else if (animal === 'peluche') {
-            options = [
-                { name: 'Beige', img: 'peluche beige.png', dotColor: '#C4B5A0', colorKey: 'crema' },
-                { name: 'Rosa', img: 'peluche rosa.png', dotColor: '#F8C3DC', colorKey: 'rosa' },
-                { name: 'Azzurro', img: 'peluche azzurro.png', dotColor: '#87CEEB', colorKey: 'azzurro' },
-                { name: 'Verde', img: 'peluche verde.png', dotColor: '#A8E6CF', colorKey: 'verde' },
-                { name: 'Peluche 1', img: 'peluche 1.png', dotColor: '#C4B5A0', colorKey: 'classico' }
-            ];
-        } else {
-            // koala
-            options = [
-                { name: 'Koala 1', img: 'koala 1.png', dotColor: '#A9B2C3', colorKey: 'grigio' }
-            ];
-        }
-
-        colorTrack.innerHTML = options.map((opt, i) => `
-            <div class="carousel-slide ${i === 0 ? 'active' : ''}" data-color-index="${i}" data-color-key="${opt.colorKey}" data-img="${opt.img}">
-                <img src="${opt.img}" alt="${opt.name}" class="carousel-plush-img" draggable="false">
-            </div>
-        `).join('');
-
-        colorDots.innerHTML = options.map((opt, i) => `
-            <button class="carousel-dot ${i === 0 ? 'active' : ''}" data-index="${i}" aria-label="${opt.name}" style="--dot-color: ${opt.dotColor};"></button>
-        `).join('');
-
-        colorCarousel.style.display = 'flex';
-        initColorCarousel(options);
-    }
-
-    function initColorCarousel(options) {
-        const viewport = document.getElementById('colorCarouselViewport');
-        const track = document.getElementById('colorCarouselTrack');
-        const dots = document.querySelectorAll('#colorCarouselDots .carousel-dot');
-        const slides = document.querySelectorAll('#colorCarouselTrack .carousel-slide');
-        if (!viewport || !track || slides.length === 0) return;
-
-        let currentIdx = 0;
-        let startX = 0;
-        let isDragging = false;
-        let dragDelta = 0;
-
-        function getSlideWidth() {
-            return slides[0].offsetWidth;
-        }
-
-        function getViewportWidth() {
-            return viewport.offsetWidth;
-        }
-
-        function getBaseOffset(index) {
-            const viewportWidth = getViewportWidth();
-            const slideWidth = getSlideWidth();
-            return (viewportWidth - slideWidth) / 2 - index * slideWidth;
-        }
-
-        function goToSlide(index, animate) {
-            if (index < 0) index = 0;
-            if (index >= slides.length) index = slides.length - 1;
-            currentIdx = index;
-            const offset = getBaseOffset(currentIdx);
-            track.style.transition = animate
-                ? 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)'
-                : 'none';
-            track.style.transform = `translateX(${offset}px)`;
-
-            dots.forEach((d, i) => d.classList.toggle('active', i === currentIdx));
-            slides.forEach((s, i) => s.classList.toggle('active', i === currentIdx));
-        }
-
-        function onDragStart(x) {
-            isDragging = true;
-            startX = x;
-            dragDelta = 0;
-            track.style.transition = 'none';
-        }
-
-        function onDragMove(x) {
-            if (!isDragging) return;
-            dragDelta = x - startX;
-            const base = getBaseOffset(currentIdx);
-            let translate = base + dragDelta;
-            if (currentIdx === 0 && dragDelta > 0) translate = base + dragDelta * 0.3;
-            if (currentIdx === slides.length - 1 && dragDelta < 0) translate = base + dragDelta * 0.3;
-            track.style.transform = `translateX(${translate}px)`;
-        }
-
-        function onDragEnd() {
-            if (!isDragging) return;
-            isDragging = false;
-
-            // Se il movimento è minimo, è un tap → seleziona colore e passa al cuoricino
-            if (Math.abs(dragDelta) < 8) {
-                const selectedOpt = options[currentIdx];
-                if (selectedOpt) {
-                    furColor = selectedOpt.colorKey;
-                    if (plushWrapper) {
-                        plushWrapper.className = `plush-wrapper enlarged color-${furColor}`;
-                    }
-                }
-                const colorCarousel = document.getElementById('colorCarousel');
-                if (colorCarousel) colorCarousel.style.display = 'none';
-                playHeartChoiceVideo();
-                return;
-            }
-
-            const threshold = getSlideWidth() * 0.3;
-            if (dragDelta < -threshold && currentIdx < slides.length - 1) {
-                currentIdx++;
-            } else if (dragDelta > threshold && currentIdx > 0) {
-                currentIdx--;
-            }
-            goToSlide(currentIdx, true);
-        }
-
-        viewport.addEventListener('touchstart', (e) => onDragStart(e.touches[0].clientX), { passive: true });
-        viewport.addEventListener('touchmove', (e) => {
-            if (isDragging) {
-                e.preventDefault();
-                onDragMove(e.touches[0].clientX);
-            }
-        }, { passive: false });
-        viewport.addEventListener('touchend', onDragEnd);
-
-        viewport.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            onDragStart(e.clientX);
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) onDragMove(e.clientX);
-        });
-        document.addEventListener('mouseup', () => {
-            if (isDragging) onDragEnd();
-        });
-
-        dots.forEach(dot => {
-            dot.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const target = parseInt(dot.dataset.index);
-                if (target !== currentIdx) {
-                    goToSlide(target, true);
-                }
-            });
-        });
-
-        goToSlide(currentIdx, false);
-    }
-
-    function dismissSplash() {
-        if (!splashScreen) return;
-        splashScreen.classList.add('fade-out');
-
-        // Inizializza Audio e avvia il motore sonoro all'interazione utente
-        initAudio();
-        playChimeSound();
-
-        setTimeout(() => {
-            splashScreen.remove();
-        }, 1000);
-    }
-
-    if (splashVideo) {
-        splashVideo.addEventListener('ended', () => {
-            goToSplashStep(2);
-        });
-    }
-
-    // ==========================================
-    // CAROUSEL SELEZIONE PELUCHE
-    // ==========================================
-    function showPlushCarousel() {
-        const carousel = document.getElementById('plushCarousel');
-        if (!carousel) return;
-        carousel.style.display = 'flex';
-        // Rimuovi il click-to-skip generico sullo splash screen
-        currentSplashClickAction = null;
-        initPlushCarousel();
-    }
-
-    function initPlushCarousel() {
-        const viewport = document.getElementById('carouselViewport');
-        const track = document.getElementById('carouselTrack');
-        const dots = document.querySelectorAll('.carousel-dot');
-        const slides = document.querySelectorAll('.carousel-slide');
-        if (!viewport || !track || slides.length === 0) return;
-
-        let currentIdx = 1; // Parte dal centro (peluche.png)
-        let startX = 0;
-        let isDragging = false;
-        let dragDelta = 0;
-
-        function getSlideWidth() {
-            return slides[0].offsetWidth;
-        }
-
-        function getViewportWidth() {
-            return viewport.offsetWidth;
-        }
-
-        function getBaseOffset(index) {
-            const viewportWidth = getViewportWidth();
-            const slideWidth = getSlideWidth();
-            return (viewportWidth - slideWidth) / 2 - index * slideWidth;
-        }
-
-        function goToSlide(index, animate) {
-            if (index < 0) index = 0;
-            if (index >= slides.length) index = slides.length - 1;
-            currentIdx = index;
-            const offset = getBaseOffset(currentIdx);
-            track.style.transition = animate
-                ? 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)'
-                : 'none';
-            track.style.transform = `translateX(${offset}px)`;
-            
-            // Aggiorna indicatori e classe active delle slide
-            dots.forEach((d, i) => d.classList.toggle('active', i === currentIdx));
-            slides.forEach((s, i) => s.classList.toggle('active', i === currentIdx));
-        }
-
-        // --- Drag gesture ---
-        function onDragStart(x) {
-            isDragging = true;
-            startX = x;
-            dragDelta = 0;
-            track.style.transition = 'none';
-        }
-
-        function onDragMove(x) {
-            if (!isDragging) return;
-            dragDelta = x - startX;
-            const base = getBaseOffset(currentIdx);
-            // Aggiunge resistenza elastica ai bordi
-            let translate = base + dragDelta;
-            if (currentIdx === 0 && dragDelta > 0) translate = base + dragDelta * 0.3;
-            if (currentIdx === slides.length - 1 && dragDelta < 0) translate = base + dragDelta * 0.3;
-            track.style.transform = `translateX(${translate}px)`;
-        }
-
-        function onDragEnd() {
-            if (!isDragging) return;
-            isDragging = false;
-
-            // Se il movimento è minimo, è un tap → seleziona peluche (tipo di animale)
-            if (Math.abs(dragDelta) < 8) {
-                const selectedSlide = slides[currentIdx];
-                const animal = selectedSlide ? (selectedSlide.dataset.animal || (currentIdx === 0 ? 'peluche' : currentIdx === 1 ? 'koala' : 'orso')) : 'koala';
-                playColorBaseVideo(animal);
-                return;
-            }
-
-            const threshold = getSlideWidth() * 0.3;
-            if (dragDelta < -threshold && currentIdx < slides.length - 1) {
-                currentIdx++;
-            } else if (dragDelta > threshold && currentIdx > 0) {
-                currentIdx--;
-            }
-            goToSlide(currentIdx, true);
-        }
-
-        // Touch events
-        viewport.addEventListener('touchstart', (e) => {
-            onDragStart(e.touches[0].clientX);
-        }, { passive: true });
-
-        viewport.addEventListener('touchmove', (e) => {
-            if (isDragging) {
-                e.preventDefault();
-                onDragMove(e.touches[0].clientX);
-            }
-        }, { passive: false });
-
-        viewport.addEventListener('touchend', onDragEnd);
-
-        // Mouse events (desktop)
-        viewport.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            onDragStart(e.clientX);
-        });
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) onDragMove(e.clientX);
-        });
-        document.addEventListener('mouseup', () => {
-            if (isDragging) onDragEnd();
-        });
-
-        // Dot click → stessa animazione slide
-        dots.forEach(dot => {
-            dot.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const target = parseInt(dot.dataset.index);
-                if (target !== currentIdx) {
-                    goToSlide(target, true);
-                }
-            });
-        });
-
-        // Posizione iniziale (senza animazione)
-        goToSlide(currentIdx, false);
-
-        // Ricalcola su resize
-        window.addEventListener('resize', () => goToSlide(currentIdx, false));
-    }
-    
     let isIntroDone = false; // Flag per disabilitare la pulsazione visiva durante l'animazione d'ingresso
     let laskaName = "Laska";
     let laskaChar = "sognatore";
@@ -692,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initAudio() {
         if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audioCtx = (window.LaskaAudio && window.LaskaAudio.getContext()) || new (window.AudioContext || window.webkitAudioContext)(); // un solo AudioContext per tutto il sito
         }
         if (audioCtx.state === 'suspended') {
             audioCtx.resume();
@@ -761,6 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let tachycardiaAudioRunning = false;
 
     function startTachycardiaSound() {
+        // Il battito dell'hero ora segue il livello di calma (calm.js): niente più 145 BPM fissi
+        if (window.LaskaCalm) { window.LaskaCalm.onHomeEnter(); return; }
         initAudio();
         if (tachycardiaAudioRunning) return;
         tachycardiaAudioRunning = true;
@@ -780,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function stopTachycardiaSound() {
+        if (window.LaskaCalm) window.LaskaCalm.onHomeLeave();
         tachycardiaAudioRunning = false;
         if (tachycardiaInterval) {
             clearTimeout(tachycardiaInterval);
@@ -822,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const statusLabel = document.getElementById('bpmStatusLabel');
         const speechText = document.getElementById('speechBubbleText');
         const yellowHeart = document.getElementById('yellowHeartImg');
+        const auraGlow = document.getElementById('breathingAuraGlow');
 
         if (!heartContainer) return;
 
@@ -834,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (bpmSlider) {
             bpmSlider.value = bpm;
         }
-        updateBpmVisuals(bpm);
 
         // Speech bubble texts
         const defaultText = `Trova le stelle che sta sognando ${laskaName || "Laska"}...`;
@@ -847,6 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, rgba(168, 85, 247, 0) 70%)", // Mid (purple)
             "radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(99, 102, 241, 0) 70%)"  // Calmo (lavender/blue)
         ];
+        updateBpmVisuals(bpm); // spostata qui: prima veniva chiamata prima che auraColors esistesse
 
         // 1. Tab buttons click handlers
         function setActiveMode(mode) {
@@ -1333,7 +681,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Web Audio Chime Synthesis
     function playChimeSound() {
         if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audioCtx = (window.LaskaAudio && window.LaskaAudio.getContext()) || new (window.AudioContext || window.webkitAudioContext)(); // un solo AudioContext per tutto il sito
         }
         if (audioCtx.state === 'suspended') {
             audioCtx.resume();
@@ -1429,8 +777,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Inizializzazione automatica (Personalizzazione rimossa)
-    laskaName = "Laska";
+    // Il compagno scelto nell'onboarding (o quello predefinito)
+    const savedCompanion = window.LaskaCompanion ? window.LaskaCompanion.current() : null;
+    laskaName = (savedCompanion && savedCompanion.name) || "Laska";
+    if (savedCompanion) {
+        selectedAnimal = savedCompanion.animal;
+        furColor = savedCompanion.color;
+    }
+    document.addEventListener('laska:companion', (e) => {
+        const c = e.detail || {};
+        laskaName = c.name || "Laska";
+        selectedAnimal = c.animal || selectedAnimal;
+        furColor = c.color || furColor;
+        if (plushFloatingName) plushFloatingName.textContent = laskaName;
+        const title = document.getElementById('chatDrawerTitle');
+        if (title) title.textContent = `${laskaName} ti ascolta`;
+        if (typeof initLaskaChat === 'function') initLaskaChat(laskaName, laskaChar);
+    });
     if (plushFloatingName) {
         plushFloatingName.textContent = laskaName;
     }
@@ -1443,8 +806,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (chatTitle) {
         chatTitle.textContent = `${laskaName} ti ascolta`;
     }
-    initLaskaChat(laskaName, laskaChar);
-    
+    // initLaskaChat viene chiamata in fondo al file: le variabili della chat
+    // (es. chatDrawerMessages) sono dichiarate più avanti e chiamarla qui
+    // bloccava l'esecuzione di tutto il resto dello script.
+
     // Avvia la transizione respiratoria interattiva
     startIntroTransition();
 
@@ -2223,18 +1588,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const sideNavRoomBtn = document.getElementById('sideNavRoomBtn');
     const sideNavInfoBtn = document.getElementById('sideNavInfoBtn');
     const sideNavQuizBtn = document.getElementById('sideNavQuizBtn');
-    const sideNavPlushQuizBtn = document.getElementById('sideNavPlushQuizBtn');
     const headerRoomBtn = document.getElementById('headerRoomBtn');
     const homeView = document.getElementById('home-view');
     const roomView = document.getElementById('room-view');
     const infoView = document.getElementById('info-view');
     const quizView = document.getElementById('quiz-view');
-    const plushQuizView = document.getElementById('plush-quiz-view');
     const exerciseView = document.getElementById('exercise-view');
     const backToExercisesBtn = document.getElementById('backToExercisesBtn');
     const productDetailView = document.getElementById('product-detail-view');
     const successView = document.getElementById('success-view');
-    const homeToPlushQuizBtn = document.getElementById('homeToPlushQuizBtn');
 
     // Elementi video della Stanza
     const roomVideo = document.getElementById('roomVideo');
@@ -2247,7 +1609,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const roomToExercisesBtn = document.getElementById('roomToExercisesBtn');
 
     // Array di tutte le viste per una gestione scalabile
-    const views = [homeView, roomView, infoView, quizView, plushQuizView, exerciseView, productDetailView, successView];
+    // Capitoli del percorso (II Respira, IV Il compagno) e il Rifugio, fuori dal percorso
+    // I quattro capitoli ora sono un'unica pagina che scorre (home-view); il Rifugio è a parte
+    const rifugioView = document.getElementById('rifugio-view');
+    const CHAPTER_VIEWS = [];
+
+    const views = [homeView, rifugioView, roomView, quizView, exerciseView, productDetailView, successView];
 
     // Funzioni di apertura/chiusura menu laterale
     function openSideMenu() {
@@ -2292,27 +1659,123 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Chiusura con tasto ESC (Accessibilità)
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && sideMenu.classList.contains('open')) {
-            closeSideMenu();
-        }
+        if (e.key !== 'Escape') return;
+        if (typeof checkoutModal !== 'undefined' && checkoutModal && checkoutModal.style.display === 'flex') { closeCheckoutModal(); return; }
+        if (typeof cartDrawer !== 'undefined' && cartDrawer && cartDrawer.classList.contains('open')) { closeCartDrawer(); return; }
+        if (typeof chatDrawer !== 'undefined' && chatDrawer && chatDrawer.classList.contains('open')) { closeChatDrawer(); return; }
+        if (sideMenu && sideMenu.classList.contains('open')) closeSideMenu();
     });
 
-    // Funzione per mostrare le viste con dissolvenza SPA
-    function showView(viewToShow, btnToActivate) {
+    // ==========================================
+    // NAVIGAZIONE IMMERSIVA
+    // - dissolvenza morbida con velo luminoso tra una pagina e l'altra
+    // - cronologia: il tasto Indietro del browser/trackpad torna alla pagina precedente
+    // - scroll dolce alla sezione richiesta (es. "Prevenzione" o "Esercizi")
+    // ==========================================
+    const NAV_FADE_MS = 420;
+    let navFromHistory = false;
+    let navTimer = null;
+    const navVeil = document.getElementById('navVeil');
+
+    const viewRoutes = {
+        'home-view': 'home',
+        'info-view': 'capire',
+        'respira-view': 'respira',
+        'compagno-view': 'compagno',
+        'rifugio-view': 'rifugio',
+        'room-view': 'stanza',
+        'quiz-view': 'test-ansia',
+        'exercise-view': 'esercizio',
+        'product-detail-view': 'peluche',
+        'success-view': 'ordine'
+    };
+
+    function routeHash(view, opts) {
+        let name = viewRoutes[view.id] || 'home';
+        if (opts.state && opts.state.exercise) name += '-' + opts.state.exercise;
+        if (opts.state && opts.state.product) name += '-' + opts.state.product;
+        if (view === infoView && opts.scrollTo === '.education-section') name = 'prevenzione';
+        if (view === homeView && opts.scrollTo === '.exercises-section') name = 'esercizi';
+        if (view === homeView && opts.scrollTo && opts.scrollTo.indexOf('#cap-') === 0) name = opts.scrollTo.slice(5);
+        if (view === homeView && opts.scrollTo === '#feelSection') name = 'respira';
+        if (view === homeView && opts.scrollTo === '#respiraTutti') name = 'esercizi';
+        if (view === homeView && opts.scrollTo === '.products-section') name = 'peluche';
+        return '#' + name;
+    }
+
+    function recordHistory(view, opts) {
+        if (navFromHistory) return;
+        const state = Object.assign({ view: view.id, scrollTo: opts.scrollTo || null }, opts.state || {});
+        try {
+            history.pushState(state, '', routeHash(view, opts));
+        } catch (err) {
+            try { history.pushState(state, ''); } catch (e) { /* cronologia non disponibile */ }
+        }
+    }
+
+    let veilJumpTimer = null;
+    function scrollToTarget(selector, smooth) {
+        const target = selector ? document.querySelector(selector) : null;
+        const destY = target ? target.getBoundingClientRect().top + window.scrollY - (selector && selector.indexOf('#cap-') === 0 ? 0 : 72) : 0;
+        const distance = Math.abs(destY - window.scrollY);
+        const reduce = document.documentElement.classList.contains('reduce-motion') ||
+            (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        if (smooth && !reduce && navVeil && distance > window.innerHeight * 1.6) {
+            // Salto lungo: la scena si dissolve nella notte e riappare nel punto giusto
+            clearTimeout(veilJumpTimer);
+            navVeil.classList.add('show');
+            veilJumpTimer = setTimeout(() => {
+                window.scrollTo({ top: Math.max(0, destY), behavior: 'auto' });
+                navVeil.classList.remove('show');
+            }, 450);
+            return;
+        }
+        window.scrollTo({ top: Math.max(0, destY), behavior: smooth && !reduce ? 'smooth' : 'auto' });
+    }
+
+    function updateNavButtons(btnToActivate) {
+        const btns = [sideNavHomeBtn, sideNavAnxietyBtn, sideNavRoomBtn, sideNavInfoBtn, sideNavQuizBtn, headerRoomBtn];
+        btns.forEach(btn => {
+            if (btn) btn.classList.remove('active');
+        });
+        if (btnToActivate) {
+            btnToActivate.classList.add('active');
+            if (btnToActivate === headerRoomBtn && sideNavRoomBtn) sideNavRoomBtn.classList.add('active');
+            if (btnToActivate === sideNavRoomBtn && headerRoomBtn) headerRoomBtn.classList.add('active');
+        }
+    }
+
+    function showView(viewToShow, btnToActivate, opts) {
+        opts = opts || {};
+        if (!viewToShow) return;
+
+        // Chiude eventuali pannelli aperti
+        if (sideMenu && sideMenu.classList.contains('open')) closeSideMenu();
+        if (typeof closeCartDrawer === 'function' && cartDrawer && cartDrawer.classList.contains('open')) closeCartDrawer();
+        if (typeof closeChatDrawer === 'function') closeChatDrawer();
+
+        updateNavButtons(btnToActivate);
+
+        // Stessa pagina: niente dissolvenza, solo uno scroll dolce verso il punto giusto
+        if (viewToShow.classList.contains('active') && viewToShow.classList.contains('visible')) {
+            recordHistory(viewToShow, opts);
+            scrollToTarget(opts.scrollTo, true);
+            return;
+        }
+
         // 1. Fermiamo tutti gli esercizi in corso per evitare rumori o timer attivi
         stopAllExercises();
-        
+
         // Avvia/ferma audio tachicardia in base alla vista
         if (viewToShow === homeView) {
             startTachycardiaSound();
         } else {
             stopTachycardiaSound();
         }
-        
+
         // Gestione classe corpo per Stanza Virtuale
         if (viewToShow === roomView) {
             document.body.classList.add('in-room-view');
-            // Avvia la riproduzione del video nella stanza
             if (roomVideo) {
                 roomVideo.play().catch(e => console.log("Autoplay del video bloccato o non pronto:", e));
                 if (videoPlayPauseBtn) {
@@ -2321,7 +1784,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             document.body.classList.remove('in-room-view');
-            // Mette in pausa il video se usciamo dalla stanza
             if (roomVideo) {
                 roomVideo.pause();
                 if (videoPlayPauseBtn) {
@@ -2329,56 +1791,99 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        
-        // 2. Transizione di fade-out per le altre viste
-        const activeViews = views.filter(v => v !== viewToShow);
-        activeViews.forEach(v => {
-            if (v) v.classList.remove('visible');
-        });
-        
-        setTimeout(() => {
-            // 3. Nascondiamo del tutto le vecchie viste e mostriamo la nuova
-            activeViews.forEach(v => {
-                if (v) v.classList.remove('active');
-            });
-            if (viewToShow) viewToShow.classList.add('active');
-            
-            // Forza il reflow
-            if (viewToShow) viewToShow.offsetHeight;
-            
-            // 4. Fade-in progressivo
-            if (viewToShow) viewToShow.classList.add('visible');
-            
-            // Scroll in alto morbido
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }, 300); // 300ms corrispondono al fade-out in CSS
 
-        // Aggiorna gli stati dei pulsanti del menu
-        const btns = [sideNavHomeBtn, sideNavAnxietyBtn, sideNavRoomBtn, sideNavInfoBtn, sideNavQuizBtn, sideNavPlushQuizBtn, headerRoomBtn];
-        btns.forEach(btn => {
-            if (btn) btn.classList.remove('active');
-        });
-        if (btnToActivate) {
-            btnToActivate.classList.add('active');
-            if (btnToActivate === headerRoomBtn && sideNavRoomBtn) {
-                sideNavRoomBtn.classList.add('active');
+        recordHistory(viewToShow, opts);
+        highlightMenu(viewToShow);
+
+        // Tra un capitolo e l'altro la dissolvenza è lenta (circa 4 secondi in tutto)
+        const fromView = views.find(v => v && v.classList.contains('active'));
+        const reduceNav = document.documentElement.classList.contains('reduce-motion') ||
+            (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        const chapterMode = !reduceNav && CHAPTER_VIEWS.includes(viewToShow) && CHAPTER_VIEWS.includes(fromView);
+        const fadeMs = chapterMode ? 2000 : NAV_FADE_MS;
+        document.body.classList.toggle('nav-chapter', chapterMode);
+
+        // 2. Dissolvenza in uscita + velo luminoso
+        const otherViews = views.filter(v => v && v !== viewToShow);
+        otherViews.forEach(v => v.classList.remove('visible'));
+        document.body.classList.add('is-navigating');
+        if (navVeil) navVeil.classList.add('show');
+
+        clearTimeout(navTimer);
+        navTimer = setTimeout(() => {
+            // 3. Scambio delle viste mentre sono invisibili
+            otherViews.forEach(v => v.classList.remove('active'));
+            viewToShow.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'auto' });
+            viewToShow.offsetHeight; // reflow
+
+            // 4. Dissolvenza in entrata
+            viewToShow.classList.add('visible');
+            if (navVeil) navVeil.classList.remove('show');
+            document.body.classList.remove('is-navigating');
+
+            // 5. Se richiesto, scivola dolcemente fino alla sezione
+            if (opts.scrollTo) {
+                setTimeout(() => scrollToTarget(opts.scrollTo, true), chapterMode ? 900 : 120);
             }
-            if (btnToActivate === sideNavRoomBtn && headerRoomBtn) {
-                headerRoomBtn.classList.add('active');
-            }
-        }
-        
-        // Chiude il menu a comparsa
-        closeSideMenu();
+            if (chapterMode) setTimeout(() => document.body.classList.remove('nav-chapter'), 2300);
+        }, fadeMs);
     }
+
+    // Voci del menu (data-goto) evidenziate in base al luogo in cui sei
+    // Dove porta ogni voce: un capitolo della pagina continua, oppure il Rifugio
+    const GOTO_TARGETS = {
+        battito: '#cap-battito', respira: '#cap-respira', capire: '#cap-capire', compagno: '#cap-compagno'
+    };
+    let currentChapter = 'battito';
+    function highlightMenu(view) {
+        const id = view ? view.id : (document.querySelector('.page-view.active') || {}).id;
+        let place;
+        if (id === 'home-view') place = currentChapter;
+        else if (id === 'room-view' || id === 'rifugio-view') place = 'rifugio';
+        else if (id === 'quiz-view') place = 'capire';
+        else if (id === 'product-detail-view' || id === 'success-view') place = 'compagno';
+        else if (id === 'exercise-view') place = 'respira';
+        document.querySelectorAll('.side-menu [data-goto]').forEach(b => {
+            const on = b.getAttribute('data-goto') === place;
+            b.classList.toggle('active', on);
+            if (on) b.setAttribute('aria-current', 'location'); else b.removeAttribute('aria-current');
+        });
+        if (headerRoomBtn) headerRoomBtn.classList.toggle('active', place === 'rifugio');
+        document.body.classList.toggle('on-path', id === 'home-view');
+    }
+
+    // Tasto Indietro / Avanti del browser
+    try { history.replaceState({ view: 'home-view' }, ''); } catch (e) { /* ignora */ }
+
+    function navButtonFor(viewId, state) {
+        switch (viewId) {
+            default: return null;   // l'evidenziazione del menu la fa highlightMenu()
+        }
+    }
+
+    window.addEventListener('popstate', (e) => {
+        const state = e.state || { view: 'home-view' };
+        navFromHistory = true;
+        try {
+            if (typeof closeCheckoutModal === 'function' && checkoutModal && checkoutModal.style.display === 'flex') closeCheckoutModal();
+            if (state.product && typeof openProductDetail === 'function') {
+                openProductDetail(state.product);
+            } else if (state.exercise) {
+                const teaser = document.querySelector(`.exercise-teaser-btn[data-exercise="${state.exercise}"]`);
+                if (teaser) teaser.click();
+            } else {
+                const view = document.getElementById(state.view) || homeView;
+                showView(view, navButtonFor(view.id, state), { scrollTo: state.scrollTo });
+            }
+        } finally {
+            navFromHistory = false;
+        }
+    });
 
     if (sideNavHomeBtn) {
         sideNavHomeBtn.addEventListener('click', () => {
-            if (homeView && !homeView.classList.contains('active')) {
-                showView(homeView, sideNavHomeBtn);
-            } else {
-                closeSideMenu();
-            }
+            showView(homeView, sideNavHomeBtn);
         });
     }
 
@@ -2394,19 +1899,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (headerRoomBtn) {
         headerRoomBtn.addEventListener('click', () => {
-            if (roomView && !roomView.classList.contains('active')) {
-                showView(roomView, headerRoomBtn);
-            }
+            showView(rifugioView, headerRoomBtn);
         });
     }
 
     if (sideNavInfoBtn) {
         sideNavInfoBtn.addEventListener('click', () => {
-            if (infoView && !infoView.classList.contains('active')) {
-                showView(infoView, sideNavInfoBtn);
-            } else {
-                closeSideMenu();
-            }
+            showView(infoView, sideNavInfoBtn, { scrollTo: '.education-section' });
         });
     }
 
@@ -2421,24 +1920,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (sideNavPlushQuizBtn) {
-        sideNavPlushQuizBtn.addEventListener('click', () => {
-            if (plushQuizView && !plushQuizView.classList.contains('active')) {
-                showView(plushQuizView, sideNavPlushQuizBtn);
-                initPlushQuiz(); // Resetta il quiz all'avvio
-            } else {
-                closeSideMenu();
-            }
-        });
-    }
-
-    if (homeToPlushQuizBtn) {
-        homeToPlushQuizBtn.addEventListener('click', () => {
-            showView(plushQuizView, sideNavPlushQuizBtn);
-            initPlushQuiz();
-        });
-    }
-
     // Routing per gli Esercizi Dedicati
     const teaserBtns = document.querySelectorAll('.exercise-teaser-btn');
     const focusPanels = document.querySelectorAll('.exercise-focus-panel');
@@ -2448,7 +1929,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const exerciseNum = btn.getAttribute('data-exercise');
             
             // 1. Mostra la vista focus-mode degli esercizi
-            showView(exerciseView, null);
+            showView(exerciseView, null, { state: { exercise: exerciseNum } });
             
             // 2. Mostra solo il pannello dell'esercizio selezionato
             focusPanels.forEach(panel => {
@@ -2461,28 +1942,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Ritorno alla Home degli esercizi
+    // Ritorno agli esercizi (capitolo II): torna da dove eri partito
     backToExercisesBtn.addEventListener('click', () => {
-        showView(homeView, sideNavHomeBtn);
-        // Ritarda lo scroll per permettere alla vista Home di completare la transizione
-        setTimeout(() => {
-            const exercisesSection = document.querySelector('.exercises-section');
-            if (exercisesSection) {
-                exercisesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 350);
+        openRespira(lastExerciseOrigin === 'feel' ? '#feelSection' : '#respiraTutti');
     });
 
     // Navigazione alla sezione ansia (ora all'inizio delle Info)
     if (sideNavAnxietyBtn) {
         sideNavAnxietyBtn.addEventListener('click', () => {
-            showView(infoView, sideNavAnxietyBtn);
-            setTimeout(() => {
-                const anxietySection = document.getElementById('anxiety-section');
-                if (anxietySection) {
-                    anxietySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }, 350);
+            showView(infoView, sideNavAnxietyBtn, { scrollTo: '#anxiety-section' });
         });
     }
 
@@ -2492,31 +1960,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (anxietyToExercisesBtn) {
         anxietyToExercisesBtn.addEventListener('click', () => {
-            showView(homeView, sideNavHomeBtn);
-            setTimeout(() => {
-                const exercisesSection = document.querySelector('.exercises-section');
-                if (exercisesSection) {
-                    exercisesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }, 350);
+            openRespira('#respiraTutti');
         });
     }
 
     if (anxietyToQuizBtn) {
         anxietyToQuizBtn.addEventListener('click', () => {
             showView(quizView, sideNavQuizBtn);
+            initQuiz();
         });
     }
 
     if (roomToExercisesBtn) {
         roomToExercisesBtn.addEventListener('click', () => {
-            showView(homeView, sideNavHomeBtn);
-            setTimeout(() => {
-                const exercisesSection = document.querySelector('.exercises-section');
-                if (exercisesSection) {
-                    exercisesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }, 350);
+            openRespira('#respiraTutti');
         });
     }
 
@@ -2700,166 +2157,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bottone "Vai agli Esercizi" con scroll automatico alla sezione
     goToExercisesBtn.addEventListener('click', () => {
         // Mostra la Home view
-        showView(homeView, sideNavHomeBtn);
-        
-        // Attendi la fine della transizione di fade, quindi effettua lo scroll alla sezione esercizi
-        setTimeout(() => {
-            const exercisesSection = document.querySelector('.exercises-section');
-            if (exercisesSection) {
-                exercisesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 350);
+        openRespira('#respiraTutti');
     });
 
-    // ==========================================
-    // 11.5. LOGICA DEL TEST PERSONALITÀ PELUCHE ("Che Peluche Sei?")
-    // ==========================================
-    const plushQuizQuestions = [
-        {
-            question: "Quando senti lo stress o l'ansia aumentare, come reagisci principalmente?",
-            optionA: "La mia mente inizia a correre: penso continuamente a tutte le possibili soluzioni.",
-            optionB: "Mi sento fragile ed emotivo, ho bisogno di sentirmi al sicuro, protetto o abbracciato.",
-            optionC: "Sento il corpo teso o pesante, il respiro corto ed ho bisogno di stendermi o fermarmi fisicamente."
-        },
-        {
-            question: "Quale senso ti aiuta maggiormente a ritrovare la calma?",
-            optionA: "L'olfatto: respirare un profumo rilassante o aromatico nell'aria.",
-            optionB: "Il tatto: toccare o stringere superfici soffici e morbide.",
-            optionC: "La pressione profonda: un abbraccio pesante e rassicurante che mi faccia sentire ancorato."
-        },
-        {
-            question: "Come descriveresti il tuo sonno nei periodi di stress?",
-            optionA: "Faccio fatica ad addormentarmi perché il cervello non si spegne mai.",
-            optionB: "Dormo ma mi sveglio spesso con un senso di solitudine o insicurezza.",
-            optionC: "Soffro di insonnia profonda, agitazione notturna ed ho bisogno di buio e silenzio assoluto."
-        },
-        {
-            question: "Qual è la tua paura o preoccupazione più ricorrente?",
-            optionA: "La paura di sbagliare, di non essere all'altezza delle mie responsabilità o di dimenticare qualcosa.",
-            optionB: "La paura del giudizio degli altri, di sentirmi escluso o non compreso.",
-            optionC: "La paura di perdere il controllo, di essere sopraffatto dagli stimoli esterni o dal panico."
-        },
-        {
-            question: "Qual è il tuo ambiente ideale per ritrovare la pace?",
-            optionA: "Una stanza ordinata, con una tisana calda e musica soft di sottofondo.",
-            optionB: "Un angolo accogliente e morbido, circondato da cuscini e oggetti familiari.",
-            optionC: "Sotto una coperta pesante, con il rumore della pioggia battente sui vetri."
-        }
-    ];
-
-    let currentPlushQuestionIndex = 0;
-    let plushUserAnswers = [];
-
-    // Riferimenti DOM
-    const plushQuizIntro = document.getElementById('plush-quiz-intro');
-    const plushQuizQuestionWrapper = document.getElementById('plush-quiz-question-wrapper');
-    const plushQuizResult = document.getElementById('plush-quiz-result');
-    const startPlushQuizBtn = document.getElementById('startPlushQuizBtn');
-    const restartPlushQuizBtn = document.getElementById('restartPlushQuizBtn');
-    const adoptPlushBtn = document.getElementById('adoptPlushBtn');
-
-    const plushOptionABtn = document.getElementById('plushOptionABtn');
-    const plushOptionBBtn = document.getElementById('plushOptionBBtn');
-    const plushOptionCBtn = document.getElementById('plushOptionCBtn');
-    const plushOptionAText = document.getElementById('plushOptionAText');
-    const plushOptionBText = document.getElementById('plushOptionBText');
-    const plushOptionCText = document.getElementById('plushOptionCText');
-
-    const plushQuizProgressBar = document.getElementById('plushQuizProgressBar');
-    const plushQuizStepInfo = document.getElementById('plushQuizStepInfo');
-    const plushQuizQuestionText = document.getElementById('plushQuizQuestionText');
-
-    const plushQuizResultTitle = document.getElementById('plushQuizResultTitle');
-    const plushQuizResultImg = document.getElementById('plushQuizResultImg');
-    const plushQuizResultDesc = document.getElementById('plushQuizResultDesc');
-
-    let currentMatchedProductId = 1;
-
-    function initPlushQuiz() {
-        currentPlushQuestionIndex = 0;
-        plushUserAnswers = [];
-        
-        plushQuizIntro.style.display = 'flex';
-        plushQuizQuestionWrapper.style.display = 'none';
-        plushQuizResult.style.display = 'none';
-    }
-
-    function startPlushQuiz() {
-        plushQuizIntro.style.display = 'none';
-        plushQuizQuestionWrapper.style.display = 'flex';
-        plushQuizResult.style.display = 'none';
-        
-        showPlushQuestion();
-    }
-
-    function showPlushQuestion() {
-        const currentQ = plushQuizQuestions[currentPlushQuestionIndex];
-        
-        plushQuizStepInfo.textContent = `Domanda ${currentPlushQuestionIndex + 1} di ${plushQuizQuestions.length}`;
-        plushQuizQuestionText.textContent = currentQ.question;
-        plushOptionAText.textContent = currentQ.optionA;
-        plushOptionBText.textContent = currentQ.optionB;
-        plushOptionCText.textContent = currentQ.optionC;
-        
-        const progressPercent = (currentPlushQuestionIndex / plushQuizQuestions.length) * 100;
-        plushQuizProgressBar.style.width = `${progressPercent}%`;
-    }
-
-    function handlePlushAnswer(answer) {
-        plushUserAnswers.push(answer);
-        
-        if (currentPlushQuestionIndex < plushQuizQuestions.length - 1) {
-            currentPlushQuestionIndex++;
-            showPlushQuestion();
-        } else {
-            plushQuizProgressBar.style.width = '100%';
-            setTimeout(showPlushResult, 250);
-        }
-    }
-
-    function showPlushResult() {
-        plushQuizQuestionWrapper.style.display = 'none';
-        plushQuizResult.style.display = 'flex';
-        
-        const counts = { A: 0, B: 0, C: 0 };
-        plushUserAnswers.forEach(ans => {
-            counts[ans] = (counts[ans] || 0) + 1;
-        });
-        
-        let winner = 'A';
-        if (counts.B > counts[winner]) winner = 'B';
-        if (counts.C > counts[winner]) winner = 'C';
-        
-        if (winner === 'A') {
-            currentMatchedProductId = 1;
-            plushQuizResultTitle.textContent = "Orsetto Lavanda";
-            plushQuizResultImg.src = "assets/plush_lavender.png";
-            plushQuizResultDesc.innerHTML = "Sei una persona riflessiva e dinamica, ma la tua mente tende a sovraccaricarsi facilmente con pensieri continui e rimuginii. Il tuo compagno ideale è l'<strong>Orsetto Lavanda</strong>: con il suo ritmo di respirazione calmo e il profumo rilassante di lavanda, ti aiuterà a disattivare il flusso continuo dei pensieri e a ritrovare la pace mentale.";
-        } else if (winner === 'B') {
-            currentMatchedProductId = 2;
-            plushQuizResultTitle.textContent = "Coniglietto Rosa";
-            plushQuizResultImg.src = "assets/plush_pink.png";
-            plushQuizResultDesc.innerHTML = "Possiedi una grande sensibilità ed empatia, ma questo ti rende incline a sentirti vulnerabile o sopraffatto a livello emotivo. Il tuo compagno ideale è il <strong>Coniglietto Rosa</strong>: dotato di un sensore interno che simula un battito cardiaco dolce e rassicurante, è perfetto per darti conforto, farti sentire protetto e coccolare la tua ipersensibilità.";
-        } else {
-            currentMatchedProductId = 3;
-            plushQuizResultTitle.textContent = "Gattino Blu Notte";
-            plushQuizResultImg.src = "assets/plush_navy.png";
-            plushQuizResultDesc.innerHTML = "Accumuli lo stress principalmente a livello fisico, manifestando tensioni, agitazione profonda o difficoltà severe a prendere sonno. Il tuo compagno ideale è il <strong>Gattino Blu Notte</strong>: grazie al suo corpo pesante (effetto weighted blanket) e al battito cardiaco caldo e profondo, ti offrirà quella stimolazione a pressione profonda necessaria per rilassare il corpo, alleviare le crisi fisiche e scivolare nel sonno.";
-        }
-    }
-
-    if (startPlushQuizBtn) startPlushQuizBtn.addEventListener('click', startPlushQuiz);
-    if (restartPlushQuizBtn) restartPlushQuizBtn.addEventListener('click', startPlushQuiz);
-    
-    if (plushOptionABtn) plushOptionABtn.addEventListener('click', () => handlePlushAnswer('A'));
-    if (plushOptionBBtn) plushOptionBBtn.addEventListener('click', () => handlePlushAnswer('B'));
-    if (plushOptionCBtn) plushOptionCBtn.addEventListener('click', () => handlePlushAnswer('C'));
-    
-    if (adoptPlushBtn) {
-        adoptPlushBtn.addEventListener('click', () => {
-            openProductDetail(currentMatchedProductId);
-        });
-    }
+    // Il vecchio test "Che Peluche sei?" ora vive solo nell'onboarding (onboarding.js):
+    // si apre all'ingresso e dal menu con "Rifai il test / Ricrea il tuo Laska".
 
     // ==========================================
     // 12. GESTIONE CARRELLO E ACQUISTO PELUCHE
@@ -2960,9 +2262,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // Aggiorna colore attivo e immagine
         updateColorSelection(selectedColor);
         updateDetailTotalPrice();
+
+        // Se è lo stesso animale del compagno creato all'inizio: suo colore e suo nome
+        const productAnimal = { 1: 'orso', 2: 'peluche', 3: 'koala' }[productId];
+        const mine = window.LaskaCompanion ? window.LaskaCompanion.get() : null;
+        if (mine && mine.animal === productAnimal) {
+            if (detailProductImg) detailProductImg.src = window.LaskaCompanion.image(mine.animal, mine.color);
+            if (customNameInput) customNameInput.value = mine.name;
+        }
         
         // Passa alla vista dettaglio
-        showView(productDetailView, null);
+        showView(productDetailView, null, { state: { product: productId } });
     }
 
     function updateColorSelection(color) {
@@ -3126,10 +2436,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 cartItemsList.appendChild(itemEl);
             });
             
-            cartSubtotal.textContent = `${subtotal.toFixed(2).replace('.', ',')} €`;
-            checkoutTotalVal.textContent = `${subtotal.toFixed(2).replace('.', ',')} €`;
+            if (cartSubtotal) cartSubtotal.textContent = `${subtotal.toFixed(2).replace('.', ',')} €`;
+            if (checkoutTotalVal) checkoutTotalVal.textContent = `${subtotal.toFixed(2).replace('.', ',')} €`;
         }
         
+        if (checkoutBtn) checkoutBtn.disabled = cart.length === 0;
+
         const removeBtns = cartItemsList.querySelectorAll('.remove-cart-item-btn');
         removeBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -3183,13 +2495,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Pulsanti di ritorno e home successo
     backToPlushBtn.addEventListener('click', () => {
-        showView(homeView, sideNavHomeBtn);
-        setTimeout(() => {
-            const productsSection = document.querySelector('.products-section');
-            if (productsSection) {
-                productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 350);
+        showView(homeView, null, { scrollTo: '.products-section' });
     });
 
     successHomeBtn.addEventListener('click', () => {
@@ -3464,6 +2770,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Effetto cursore magico con stelline pastello
     let lastTrailTime = 0;
     let isCursorOverPlush = false;
+    let tiltRafId = null; // mancava: senza questa riga passare sopra un peluche dava errore
     let currentHoveredPlush = null;
 
     function isTouchDevice() {
@@ -3861,7 +3168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const roomBackBtn = document.getElementById('roomBackBtn');
     if (roomBackBtn) {
         roomBackBtn.addEventListener('click', () => {
-            showView(homeView, sideNavHomeBtn);
+            showView(rifugioView, headerRoomBtn);
         });
     }
 
@@ -4377,4 +3684,121 @@ document.addEventListener('DOMContentLoaded', () => {
             heroSection.classList.add('night-deep-blue');
         }
     }, 180000); // 3 minutes = 180,000 ms
+
+    // Inizializza la chat ora che tutte le sue variabili sono dichiarate
+    initLaskaChat(laskaName, laskaChar);
+
+    // ==========================================
+    // NAVIGAZIONE A CAPITOLI
+    // ==========================================
+    function openRespira(target) {
+        showView(homeView, null, { scrollTo: target || '#cap-respira' });
+    }
+
+    // "Cosa senti adesso?" apre l'esercizio giusto a schermo intero
+    let lastExerciseOrigin = 'list';
+    document.querySelectorAll('.feel-card').forEach(card => {
+        card.addEventListener('click', () => {
+            lastExerciseOrigin = 'feel';
+            const teaser = document.querySelector(`.exercise-teaser-btn[data-exercise="${card.getAttribute('data-exercise')}"]`);
+            if (teaser) teaser.click();
+            lastExerciseOrigin = 'feel';
+        });
+    });
+    document.querySelectorAll('.exercise-teaser-btn').forEach(btn => {
+        btn.addEventListener('click', () => { lastExerciseOrigin = 'list'; }, true);
+    });
+
+    // Tutti i collegamenti data-goto (menu, fine capitolo, freccia dell'hero)
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('[data-goto]');
+        if (!link) return;
+        const where = link.getAttribute('data-goto');
+        e.preventDefault();
+        if (where === 'rifugio') { showView(rifugioView, headerRoomBtn); return; }
+        if (GOTO_TARGETS[where]) showView(homeView, null, { scrollTo: GOTO_TARGETS[where] });
+    });
+
+    // In quale capitolo sei? Lo dice un'etichetta discreta in alto (e il menu)
+    const chapterIndicator = document.getElementById('chapterIndicator');
+    const chapterSections = document.querySelectorAll('#home-view .chapter');
+    const CHAPTER_KEYS = { 'cap-battito': 'battito', 'cap-respira': 'respira', 'cap-capire': 'capire', 'cap-compagno': 'compagno' };
+    if ('IntersectionObserver' in window && chapterSections.length) {
+        const chapterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const sec = entry.target;
+                currentChapter = CHAPTER_KEYS[sec.id] || currentChapter;
+                if (chapterIndicator) {
+                    chapterIndicator.classList.remove('is-changing');
+                    void chapterIndicator.offsetWidth;
+                    chapterIndicator.innerHTML = `<span>${sec.getAttribute('data-chapter')}</span> ${sec.getAttribute('data-chapter-name')}`;
+                    chapterIndicator.classList.add('is-changing');
+                }
+                if (homeView.classList.contains('active')) highlightMenu(homeView);
+            });
+        }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+        chapterSections.forEach(sec => chapterObserver.observe(sec));
+
+        // le introduzioni dei capitoli si dissolvono dentro mentre ci arrivi
+        const introObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('in-view'); });
+        }, { threshold: 0.35 });
+        document.querySelectorAll('#home-view .chapter-intro').forEach(el => introObserver.observe(el));
+    } else {
+        document.querySelectorAll('.chapter-intro').forEach(el => el.classList.add('in-view'));
+    }
+
+    // Il Rifugio: stanza, suoni, playlist
+    const rifugioRoomBtn = document.getElementById('rifugioRoomBtn');
+    const rifugioSoundBtn = document.getElementById('rifugioSoundBtn');
+    const rifugioPlaylistBtn = document.getElementById('rifugioPlaylistBtn');
+    if (rifugioRoomBtn) rifugioRoomBtn.addEventListener('click', () => showView(roomView, headerRoomBtn));
+    if (rifugioSoundBtn) rifugioSoundBtn.addEventListener('click', () => {
+        const teaser = document.querySelector('.exercise-teaser-btn[data-exercise="5"]');
+        if (teaser) teaser.click();
+    });
+    if (rifugioPlaylistBtn) rifugioPlaylistBtn.addEventListener('click', () => scrollToTarget('.spotify-exchange-section', true));
+
+    // Capitolo III: le esperienze dell'ansia, una alla volta mentre scorri
+    const storySteps = document.querySelectorAll('.story-steps > .experience-card, .story-step');
+    if ('IntersectionObserver' in window && storySteps.length) {
+        document.documentElement.classList.add('story-ready');
+        const storyObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => entry.target.classList.toggle('is-current', entry.isIntersecting));
+        }, { rootMargin: '-38% 0px -38% 0px', threshold: 0 });
+        storySteps.forEach(el => storyObserver.observe(el));
+    }
+
+    highlightMenu(homeView);
+
+    // Freccia "Scorri" nella home: scende dolcemente agli esercizi
+    const heroScrollCue = document.getElementById('heroScrollCue');
+    if (heroScrollCue) {
+        // va al capitolo II tramite data-goto="respira" (vedi navigazione a capitoli)
+    }
+
+    // Comparsa morbida dei contenuti mentre si scorre
+    const revealTargets = document.querySelectorAll(
+        '.section-header, .exercise-card, .product-card, .edu-card, .experience-card, .myth-card, ' +
+        '.playlist-card, .spotify-form-card, .plush-quiz-banner-container, .quiz-container, .awareness-block, .experience-cta, .stat-box'
+    );
+    const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if ('IntersectionObserver' in window && !prefersReducedMotion) {
+        document.documentElement.classList.add('reveal-ready');
+        const siblingsIndex = el => Array.prototype.indexOf.call(el.parentElement.children, el);
+        revealTargets.forEach(el => {
+            el.classList.add('reveal');
+            el.style.setProperty('--reveal-delay', (Math.min(siblingsIndex(el), 5) * 80) + 'ms');
+        });
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        revealTargets.forEach(el => revealObserver.observe(el));
+    }
 });

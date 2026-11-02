@@ -11,121 +11,423 @@
     <!-- Google Fonts: Nunito per un'estetica morbida, arrotondata e terapeutica -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="styles.css?v=20260904">
+    <link rel="stylesheet" href="styles.css?v=20261102e">
 
     <!-- Model Viewer per il rendering 3D di heart_in_love.glb -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <!-- Onboarding già completato? Allora non mostrarlo nemmeno per un istante -->
+    <script>
+        try {
+            var laskaSaved = JSON.parse(localStorage.getItem('laska.companion') || 'null');
+            if (laskaSaved && laskaSaved.done) document.documentElement.classList.add('ob-done');
+        } catch (e) { /* localStorage non disponibile */ }
+    </script>
 </head>
 
 <body>
 
-    <!-- Schermata Iniziale (Splash Screen Video Sequenza) -->
-    <div id="splash-screen" class="splash-screen-overlay">
-        <video id="splashVideo" src="inizio sito.MOV" autoplay muted playsinline></video>
-        <video id="splashVideo2" src="Inizio personalizzazione.MOV" muted playsinline style="display:none;"></video>
-        <video id="splashVideo3" src="Personalizzazionepeluche.mov" muted playsinline style="display:none;"></video>
-        <video id="splashVideo4" src="colore base.mov" muted playsinline style="display:none;"></video>
-        <video id="splashVideo5" src="cuoricino scelta .mov" muted playsinline style="display:none;"></video>
-        <video id="splashVideo6" src="nome scelta.MOV" muted playsinline style="display:none;"></video>
-        <video id="splashVideo7" src="cuore rosa coniglio grigio.MOV" muted playsinline style="display:none;"></video>
-        <video id="splashVideo8" src="coniglio ansia.mov" muted playsinline style="display:none;"></video>
-        <video id="splashVideo9" src="Aiutami.mov" muted playsinline style="display:none;"></video>
+    <!-- ==========================================================
+         ONBOARDING — "Che Laska sei?" è la prima cosa che si vede.
+         Tre tappe: Scopri (test) → Crea (colore, cuore, oggetti, nome) → Lily.
+         Logica in onboarding.js. Chi ha già completato il percorso non lo vede
+         (classe .ob-done impostata nello <head>).
+         ========================================================== -->
+    <div class="ob" id="onboarding" role="dialog" aria-modal="true" aria-labelledby="obT-soglia" data-scene="soglia" data-stage="scopri">
 
-        <!-- Bottone Salta Personalizzazione (appare solo durante il Video 2) -->
-        <button id="skipCustomizationBtn" style="display:none; position:absolute; left:1000px; top:700px; width:210px; height:60px; background-color:rgba(167, 136, 216, 0.43); border-radius:16px; border:none; color:#FFFFFF; font-family:'Nunito', sans-serif; font-size:1.1rem; font-weight:700; cursor:pointer; z-index:15; transition: transform 0.2s, background-color 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-            salta personalizzazione
-        </button>
+        <!-- Cielo notturno -->
+        <div class="ob-sky" aria-hidden="true">
+            <svg width="0" height="0" style="position:absolute">
+                <symbol id="obSparkle" viewBox="0 0 24 24">
+                    <path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/>
+                </symbol>
+                <symbol id="obHeart" viewBox="0 0 24 24">
+                    <path d="M12 21.2s-7.6-4.7-9.7-9.3C.8 8.5 2.9 4.8 6.4 4.8c2.1 0 3.6 1.2 4.4 2.6.4.7 1.9.7 2.3 0 .8-1.4 2.3-2.6 4.4-2.6 3.5 0 5.6 3.7 4.1 7.1-2.1 4.6-9.6 9.3-9.6 9.3z"/>
+                </symbol>
+                <!-- Icone delle risposte e degli oggetti (linee luminose) -->
+                <symbol id="obIcMente" viewBox="0 0 24 24"><path d="M8 21v-3.2A7.2 7.2 0 1 1 18.6 11l1.6 2.8H18.4V17a2 2 0 0 1-2 2H15v2"/><path d="M11.2 9.6a1.4 1.4 0 1 1 1.4 1.4 2.6 2.6 0 0 1-2.6-2.6 3.6 3.6 0 0 1 7.2 0"/></symbol>
+                <symbol id="obIcProtetto" viewBox="0 0 24 24"><path d="M12 2.8 19 5.8V11c0 5-3.4 8.6-7 10.2C8.4 19.6 5 16 5 11V5.8z"/><path d="M12 15.6s-3-1.8-3-4a1.6 1.6 0 0 1 3-.8 1.6 1.6 0 0 1 3 .8c0 2.2-3 4-3 4z"/></symbol>
+                <symbol id="obIcCorpo" viewBox="0 0 24 24"><path d="M5.5 20.5h13l-2.2-9.5H7.7z"/><path d="M9.6 11a2.4 2.4 0 1 1 4.8 0"/><path d="M9 16h6"/></symbol>
+                <symbol id="obIcLavanda" viewBox="0 0 24 24"><path d="M12 21.5V7.5"/><path d="M12 7.5c-1.6-1-1.6-3.2 0-4.3 1.6 1.1 1.6 3.3 0 4.3z"/><path d="M12 11.5c-2.1 0-3.2-1.6-3.2-3.2 2.1 0 3.2 1.6 3.2 3.2zM12 11.5c2.1 0 3.2-1.6 3.2-3.2-2.1 0-3.2 1.6-3.2 3.2z"/><path d="M12 15.5c-2.1 0-3.2-1.6-3.2-3.2 2.1 0 3.2 1.6 3.2 3.2zM12 15.5c2.1 0 3.2-1.6 3.2-3.2-2.1 0-3.2 1.6-3.2 3.2z"/></symbol>
+                <symbol id="obIcMorbido" viewBox="0 0 24 24"><path d="M7 18.5h10a4 4 0 0 0 .6-8A5.6 5.6 0 0 0 7 9.6a4.5 4.5 0 0 0 0 8.9z"/><path d="M9.5 14.5c1.4 1 3.6 1 5 0"/></symbol>
+                <symbol id="obIcAbbraccio" viewBox="0 0 24 24"><path d="M3.5 11.5c0 5.2 3.8 8.5 8.5 8.5s8.5-3.3 8.5-8.5"/><path d="M3.5 11.5c0-2.2 2.2-3.2 3.8-2M20.5 11.5c0-2.2-2.2-3.2-3.8-2"/><path d="M12 15s-3-1.8-3-4a1.6 1.6 0 0 1 3-.8 1.6 1.6 0 0 1 3 .8c0 2.2-3 4-3 4z"/></symbol>
+                <symbol id="obIcTesta" viewBox="0 0 24 24"><path d="M8 21v-3.2A7.2 7.2 0 1 1 18.6 11l1.6 2.8H18.4V17a2 2 0 0 1-2 2H15v2"/><path d="M12.8 6.2l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z"/></symbol>
+                <symbol id="obIcSveglia" viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.2"/><path d="M12 9.4V13l2.4 1.8"/><path d="M4 6.2 6.8 4M20 6.2 17.2 4"/></symbol>
+                <symbol id="obIcSonno" viewBox="0 0 24 24"><path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z"/><path d="M14.5 4h3.2l-3.2 3.4h3.2"/></symbol>
+                <symbol id="obIcCopertina" viewBox="0 0 24 24"><path d="M3.5 7h13a3.2 3.2 0 0 1 0 6.4h-10a2.1 2.1 0 0 0 0 4.2h14"/><path d="M3.5 7v10.6"/><path d="M8 10.2h6"/></symbol>
+                <symbol id="obIcLucina" viewBox="0 0 24 24"><path d="M9 21h6M12 21v-4.5"/><path d="M16.8 9.2A4.8 4.8 0 1 1 11 3.2a3.8 3.8 0 0 0 5.8 6z"/><path d="M5 13.5l1.2-.6M19 13.5l-1.2-.6M12 14.4v-1"/></symbol>
+                <symbol id="obIcCuffie" viewBox="0 0 24 24"><path d="M4 15.5V12a8 8 0 0 1 16 0v3.5"/><path d="M4 15.5A2 2 0 0 1 6 13.5h1v6H6a2 2 0 0 1-2-2zM20 15.5a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2z"/></symbol>
+            </svg>
+            <div class="ob-dust ob-dust-a"></div>
+            <div class="ob-dust ob-dust-b"></div>
+            <svg class="ob-sparkle" style="--x:8%;--y:16%;--s:22px;--d:0s;--o:.9"><use href="#obSparkle"/></svg>
+            <svg class="ob-sparkle" style="--x:18%;--y:72%;--s:14px;--d:1.4s;--o:.6"><use href="#obSparkle"/></svg>
+            <svg class="ob-sparkle" style="--x:31%;--y:34%;--s:10px;--d:2.2s;--o:.45"><use href="#obSparkle"/></svg>
+            <svg class="ob-sparkle" style="--x:70%;--y:20%;--s:12px;--d:.7s;--o:.55"><use href="#obSparkle"/></svg>
+            <svg class="ob-sparkle" style="--x:86%;--y:10%;--s:20px;--d:1.9s;--o:.9"><use href="#obSparkle"/></svg>
+            <svg class="ob-sparkle" style="--x:92%;--y:62%;--s:16px;--d:2.8s;--o:.7"><use href="#obSparkle"/></svg>
+            <svg class="ob-sparkle" style="--x:62%;--y:88%;--s:10px;--d:1.1s;--o:.4"><use href="#obSparkle"/></svg>
+            <svg class="ob-sparkle" style="--x:44%;--y:8%;--s:10px;--d:3.1s;--o:.5"><use href="#obSparkle"/></svg>
+        </div>
 
-        <!-- Frecce di navigazione splash -->
-        <button id="splashPrevBtn" class="splash-nav-btn" style="display:none;" aria-label="Indietro">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-        </button>
-        <button id="splashNextBtn" class="splash-nav-btn" aria-label="Avanti">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-        </button>
+        <!-- Luna: falce sottile che cresce mentre Lily si calma -->
+        <svg class="ob-moon" viewBox="0 0 400 400" aria-hidden="true">
+            <defs>
+                <radialGradient id="obMoonFill" cx="35%" cy="60%" r="75%">
+                    <stop offset="0%" stop-color="#F8EEF8"/>
+                    <stop offset="100%" stop-color="#E2CBE8"/>
+                </radialGradient>
+            </defs>
+            <path id="obMoonLit" fill="url(#obMoonFill)" d="M200 50 A150 150 0 0 0 200 350 A120 150 0 0 1 200 50 Z"/>
+        </svg>
 
-        <!-- Carousel Selezione Peluche -->
-        <div id="plushCarousel" class="plush-carousel-container" style="display:none;">
-            <div class="carousel-viewport" id="carouselViewport">
-                <div class="carousel-track" id="carouselTrack">
-                    <div class="carousel-slide" data-plush-index="0" data-animal="peluche">
-                        <img src="peluche 1.png" alt="Peluche 1" class="carousel-plush-img interactive-plush" draggable="false">
+        <!-- Barra superiore: le tre tappe, audio, salta -->
+        <div class="ob-top">
+            <ol class="ob-stages" aria-label="Le tappe">
+                <li class="ob-stage" data-stage="scopri"><span class="ob-stage-bar"><i></i></span><span class="ob-stage-name">Scopri</span></li>
+                <li class="ob-stage" data-stage="crea"><span class="ob-stage-bar"><i></i></span><span class="ob-stage-name">Crea</span></li>
+                <li class="ob-stage" data-stage="lily"><span class="ob-stage-bar"><i></i></span><span class="ob-stage-name">Lily</span></li>
+            </ol>
+            <p class="ob-sr" id="obStepLabel" aria-live="polite">Tappa Scopri</p>
+            <div class="ob-top-actions">
+                <button class="ob-icon-btn" id="obAudioBtn" type="button" aria-pressed="true" aria-label="Audio attivo: tocca per silenziare">
+                    <svg class="ob-ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+                    <svg class="ob-ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="m22 9-6 6M16 9l6 6"/></svg>
+                </button>
+                <button class="ob-skip" id="obSkipBtn" type="button">Salta</button>
+            </div>
+        </div>
+
+        <!-- Il compagno (condiviso: rivelazione, creazione, respiro con Lily, ingresso) -->
+        <figure class="ob-companion" aria-hidden="true">
+            <div class="ob-companion-figure">
+                <img class="ob-companion-img is-shown" src="compagni/peluche-classico.webp" alt="" draggable="false">
+                <img class="ob-companion-img" src="compagni/peluche-classico.webp" alt="" draggable="false">
+                <span class="ob-companion-heart"><svg viewBox="0 0 24 24"><use href="#obHeart"/></svg></span>
+            </div>
+            <div class="ob-companion-objects" id="obCompanionObjects"></div>
+            <figcaption class="ob-companion-name" id="obCompanionName"></figcaption>
+        </figure>
+
+        <!-- Lily, la coniglietta che sogna -->
+        <div class="ob-lily-wrap" aria-hidden="true">
+            <svg class="ob-lily is-agitated" id="obLily" viewBox="0 0 340 230">
+                <defs>
+                    <radialGradient id="lilyFur" cx="40%" cy="35%" r="75%">
+                        <stop offset="0%" stop-color="#FBF6FF"/>
+                        <stop offset="60%" stop-color="#E4D6F6"/>
+                        <stop offset="100%" stop-color="#B9A2E2"/>
+                    </radialGradient>
+                    <radialGradient id="lilyEar" cx="50%" cy="50%" r="60%">
+                        <stop offset="0%" stop-color="#FFC9E6"/>
+                        <stop offset="100%" stop-color="#F2A6D2"/>
+                    </radialGradient>
+                    <radialGradient id="lilyCloud" cx="50%" cy="40%" r="60%">
+                        <stop offset="0%" stop-color="rgba(220,200,255,.55)"/>
+                        <stop offset="100%" stop-color="rgba(160,120,240,0)"/>
+                    </radialGradient>
+                </defs>
+                <ellipse cx="175" cy="196" rx="150" ry="26" fill="url(#lilyCloud)"/>
+                <g class="lily-body">
+                    <circle cx="282" cy="160" r="17" fill="#FBF6FF"/>
+                    <ellipse cx="190" cy="152" rx="100" ry="54" fill="url(#lilyFur)"/>
+                    <ellipse cx="245" cy="186" rx="34" ry="16" fill="#EFE6FB"/>
+                    <g class="lily-heart" transform="translate(170 140)">
+                        <circle r="22" fill="rgba(255,150,215,.25)"/>
+                        <path d="M0 9s-11-6.8-13.6-13c-1.8-4.4 1-9 5.4-9 2.9 0 4.8 1.6 5.8 3.4.4.8 4.4.8 4.8 0 1-1.8 2.9-3.4 5.8-3.4 4.4 0 7.2 4.6 5.4 9C11 2.2 0 9 0 9z" fill="#FFB3E0"/>
+                    </g>
+                </g>
+                <g class="lily-head">
+                    <g class="lily-ears">
+                        <ellipse cx="150" cy="96" rx="68" ry="17" transform="rotate(-10 150 96)" fill="#EEE3FB"/>
+                        <ellipse cx="152" cy="96" rx="52" ry="8" transform="rotate(-10 152 96)" fill="url(#lilyEar)"/>
+                        <ellipse cx="160" cy="114" rx="62" ry="15" transform="rotate(3 160 114)" fill="#E7DAF8"/>
+                        <ellipse cx="163" cy="114" rx="46" ry="7" transform="rotate(3 163 114)" fill="url(#lilyEar)" opacity=".85"/>
+                    </g>
+                    <circle cx="96" cy="136" r="54" fill="url(#lilyFur)"/>
+                    <ellipse cx="70" cy="156" rx="11" ry="7" fill="#FFB8DD" opacity=".55"/>
+                    <ellipse cx="122" cy="156" rx="11" ry="7" fill="#FFB8DD" opacity=".45"/>
+                    <path d="M92 152c2-2 6-2 8 0-1 2.5-2.5 4-4 4s-3-1.5-4-4z" fill="#F49AC9"/>
+                    <g class="lily-face-agitated" fill="none" stroke="#6B5590" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M62 138l9 4 9-4"/>
+                        <path d="M108 138l9 4 9-4"/>
+                        <path d="M64 124l14 6"/>
+                        <path d="M128 124l-14 6"/>
+                        <path d="M86 168c3-3 6 0 9-3s6 0 9-3"/>
+                    </g>
+                    <g class="lily-face-calm" fill="none" stroke="#6B5590" stroke-width="3" stroke-linecap="round">
+                        <path d="M62 140c5 5 13 5 18 0"/>
+                        <path d="M108 140c5 5 13 5 18 0"/>
+                        <path d="M89 165c4 4 10 4 14 0"/>
+                    </g>
+                    <path class="lily-drop" d="M150 112c4 6 6 9 6 12a6 6 0 0 1-12 0c0-3 2-6 6-12z" fill="#BFE6FF"/>
+                </g>
+                <ellipse cx="128" cy="184" rx="24" ry="13" fill="#F3ECFC"/>
+                <g class="lily-worry" fill="none" stroke="#CDB8F2" stroke-width="2.5" stroke-linecap="round">
+                    <path d="M30 92c6-4 10 4 16 0"/>
+                    <path d="M22 110c6-4 10 4 16 0"/>
+                </g>
+                <g class="lily-z" fill="#E9DDFF" font-family="Outfit, Nunito, sans-serif" font-weight="600">
+                    <text x="44" y="84" font-size="16">z</text>
+                    <text x="30" y="62" font-size="20">z</text>
+                    <text x="12" y="38" font-size="24">Z</text>
+                </g>
+            </svg>
+        </div>
+
+        <!-- Battito -->
+        <div class="ob-bpm" aria-live="off">
+            <svg class="ob-bpm-heart" viewBox="0 0 24 24" aria-hidden="true"><use href="#obHeart"/></svg>
+            <span class="ob-bpm-num" id="obBpmNum">60</span>
+            <span class="ob-bpm-unit">BPM</span>
+        </div>
+
+        <!-- ================= SCOPRI ================= -->
+
+        <!-- Apertura: un'unica scena prima del test -->
+        <section class="ob-scene" data-scene="soglia" aria-labelledby="obT-soglia">
+            <div class="ob-text">
+                <h1 class="ob-line ob-title" id="obT-soglia" style="--i:0">Ciao. Questo è un posto lento.</h1>
+                <p class="ob-line ob-sub" style="--i:1">Prima di entrare, scopriamo chi ti terrà compagnia.</p>
+            </div>
+            <div class="ob-controls" style="--after:2">
+                <button class="ob-btn ob-btn-primary" type="button" data-action="enter">Scopri il tuo Laska</button>
+                <p class="ob-hint ob-headphones"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcCuffie"/></svg>Metti le cuffie, se puoi</p>
+            </div>
+        </section>
+
+        <!-- Domanda 1 -->
+        <section class="ob-scene ob-quiz" data-scene="q1" aria-labelledby="obT-q1">
+            <div class="ob-text">
+                <p class="ob-line ob-kicker" style="--i:0">Domanda 1 di 3</p>
+                <h2 class="ob-line ob-title" id="obT-q1" style="--i:.5">Quando l'ansia arriva, cosa senti di più?</h2>
+            </div>
+            <div class="ob-choices ob-line" style="--i:1.3" role="radiogroup" aria-labelledby="obT-q1">
+                <button type="button" class="ob-choice" role="radio" aria-checked="false" data-answer="A"><span class="ob-choice-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcMente"/></svg></span><span class="ob-choice-txt">La mente che corre</span></button>
+                <button type="button" class="ob-choice" role="radio" aria-checked="false" data-answer="B"><span class="ob-choice-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcProtetto"/></svg></span><span class="ob-choice-txt">Il bisogno di sentirmi protetto</span></button>
+                <button type="button" class="ob-choice" role="radio" aria-checked="false" data-answer="C"><span class="ob-choice-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcCorpo"/></svg></span><span class="ob-choice-txt">Il corpo pesante e teso</span></button>
+            </div>
+            <div class="ob-controls" style="--after:2"><p class="ob-hint">Scegli quella che ti somiglia di più</p></div>
+        </section>
+
+        <!-- Domanda 2 -->
+        <section class="ob-scene ob-quiz" data-scene="q2" aria-labelledby="obT-q2">
+            <div class="ob-text">
+                <p class="ob-line ob-kicker" style="--i:0">Domanda 2 di 3</p>
+                <h2 class="ob-line ob-title" id="obT-q2" style="--i:.5">Cosa ti aiuta a ritrovare la calma?</h2>
+            </div>
+            <div class="ob-choices ob-line" style="--i:1.3" role="radiogroup" aria-labelledby="obT-q2">
+                <button type="button" class="ob-choice" role="radio" aria-checked="false" data-answer="A"><span class="ob-choice-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcLavanda"/></svg></span><span class="ob-choice-txt">Un profumo rilassante</span></button>
+                <button type="button" class="ob-choice" role="radio" aria-checked="false" data-answer="B"><span class="ob-choice-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcMorbido"/></svg></span><span class="ob-choice-txt">Qualcosa di morbido da stringere</span></button>
+                <button type="button" class="ob-choice" role="radio" aria-checked="false" data-answer="C"><span class="ob-choice-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcAbbraccio"/></svg></span><span class="ob-choice-txt">Un abbraccio che pesa e mi tiene</span></button>
+            </div>
+            <div class="ob-controls" style="--after:2"><p class="ob-hint">Non c'è una risposta giusta</p></div>
+        </section>
+
+        <!-- Domanda 3 -->
+        <section class="ob-scene ob-quiz" data-scene="q3" aria-labelledby="obT-q3">
+            <div class="ob-text">
+                <p class="ob-line ob-kicker" style="--i:0">Domanda 3 di 3</p>
+                <h2 class="ob-line ob-title" id="obT-q3" style="--i:.5">E la notte, come va?</h2>
+            </div>
+            <div class="ob-choices ob-line" style="--i:1.3" role="radiogroup" aria-labelledby="obT-q3">
+                <button type="button" class="ob-choice" role="radio" aria-checked="false" data-answer="A"><span class="ob-choice-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcTesta"/></svg></span><span class="ob-choice-txt">La testa non si spegne</span></button>
+                <button type="button" class="ob-choice" role="radio" aria-checked="false" data-answer="B"><span class="ob-choice-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcSveglia"/></svg></span><span class="ob-choice-txt">Mi sveglio agitato</span></button>
+                <button type="button" class="ob-choice" role="radio" aria-checked="false" data-answer="C"><span class="ob-choice-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcSonno"/></svg></span><span class="ob-choice-txt">Faccio fatica ad addormentarmi</span></button>
+            </div>
+            <div class="ob-controls" style="--after:2"><p class="ob-hint">Ultima domanda</p></div>
+        </section>
+
+        <!-- Rivelazione -->
+        <section class="ob-scene" data-scene="rivela" aria-labelledby="obT-rivela">
+            <div class="ob-text">
+                <p class="ob-line ob-kicker" style="--i:0">Il tuo Laska è…</p>
+                <h2 class="ob-line ob-title ob-reveal-name" id="obT-rivela" style="--i:1.6">l'Orsetto</h2>
+            </div>
+            <div class="ob-stage-spacer"></div>
+            <div class="ob-controls" style="--after:2.6">
+                <p class="ob-sub ob-reveal-why" id="obRevealWhy"></p>
+                <button class="ob-btn ob-btn-primary" type="button" data-action="next">Crealo con me</button>
+                <button class="ob-link" type="button" data-action="change">Preferisci un altro compagno?</button>
+            </div>
+        </section>
+
+        <!-- Cambia compagno (dal link della rivelazione) -->
+        <section class="ob-scene" data-scene="compagno" aria-labelledby="obT-compagno">
+            <div class="ob-text">
+                <h2 class="ob-line ob-title" id="obT-compagno" style="--i:0">Scegli tu chi vuoi accanto.</h2>
+            </div>
+            <div class="ob-carousel ob-line" style="--i:1" id="obCarousel" tabindex="0" role="group" aria-roledescription="carosello" aria-label="Scegli il tuo compagno. Usa le frecce sinistra e destra.">
+                <div class="ob-carousel-track" id="obCarouselTrack">
+                    <div class="ob-slide" data-animal="peluche" role="group" aria-roledescription="opzione" aria-label="Coniglietto">
+                        <img src="compagni/peluche-classico.webp" alt="Coniglietto di peluche che dorme" draggable="false">
+                        <h3>Coniglietto</h3>
+                        <p>Un cuore che batte piano, da tenere vicino.</p>
                     </div>
-                    <div class="carousel-slide" data-plush-index="1" data-animal="koala">
-                        <img src="koala 1.png" alt="Koala 1" class="carousel-plush-img interactive-plush" draggable="false">
+                    <div class="ob-slide" data-animal="orso" role="group" aria-roledescription="opzione" aria-label="Orsetto">
+                        <img src="compagni/orso-classico.webp" alt="Orsetto di peluche che dorme" draggable="false">
+                        <h3>Orsetto</h3>
+                        <p>Caldo e paziente. Resta finché la notte non passa.</p>
                     </div>
-                    <div class="carousel-slide" data-plush-index="2" data-animal="orso">
-                        <img src="orso 1.png" alt="Orso 1" class="carousel-plush-img interactive-plush" draggable="false">
+                    <div class="ob-slide" data-animal="koala" role="group" aria-roledescription="opzione" aria-label="Koala">
+                        <img src="compagni/koala-grigio.webp" alt="Koala di peluche che dorme" draggable="false">
+                        <h3>Koala</h3>
+                        <p>Lento come un abbraccio che non ha fretta.</p>
                     </div>
                 </div>
             </div>
-            <div class="carousel-color-dots" id="carouselDots">
-                <button class="carousel-dot" data-index="0" aria-label="Peluche 1" style="--dot-color: #C4B5A0;"></button>
-                <button class="carousel-dot active" data-index="1" aria-label="Koala 1" style="--dot-color: #A9B2C3;"></button>
-                <button class="carousel-dot" data-index="2" aria-label="Orso 1" style="--dot-color: #B08B6B;"></button>
+            <div class="ob-controls" style="--after:2">
+                <div class="ob-choice-dots" id="obCarouselDots">
+                    <button type="button" data-index="0" aria-label="Coniglietto"></button>
+                    <button type="button" data-index="1" aria-label="Orsetto"></button>
+                    <button type="button" data-index="2" aria-label="Koala"></button>
+                </div>
+                <p class="ob-hint">Trascina, oppure usa le frecce ← →</p>
+                <button class="ob-btn ob-btn-primary" type="button" data-action="next">È lui</button>
             </div>
-        </div>
+        </section>
 
-        <!-- Carousel Selezione Colore -->
-        <div id="colorCarousel" class="plush-carousel-container" style="display:none;">
-            <div class="carousel-viewport" id="colorCarouselViewport">
-                <div class="carousel-track" id="colorCarouselTrack">
-                    <!-- Popolato dinamicamente da app.js -->
+        <!-- ================= CREA ================= -->
+
+        <!-- Colore -->
+        <section class="ob-scene" data-scene="colore" aria-labelledby="obT-colore">
+            <div class="ob-text">
+                <h2 class="ob-line ob-title" id="obT-colore" style="--i:0">Di che colore è la tua calma?</h2>
+                <p class="ob-line ob-sub ob-koala-note" style="--i:1">Il koala ha un solo colore: morbido come la nebbia.</p>
+            </div>
+            <div class="ob-stage-spacer"></div>
+            <div class="ob-controls" style="--after:1">
+                <div class="ob-swatches" id="obSwatches" role="radiogroup" aria-label="Colore del compagno"></div>
+                <button class="ob-btn ob-btn-primary" type="button" data-action="next">Questo</button>
+            </div>
+        </section>
+
+        <!-- Cuore -->
+        <section class="ob-scene" data-scene="cuore" aria-labelledby="obT-cuore">
+            <div class="ob-text">
+                <h2 class="ob-line ob-title" id="obT-cuore" style="--i:0">Dentro di lui batte un cuore.</h2>
+                <p class="ob-line ob-sub" style="--i:1">Sceglilo tu.</p>
+            </div>
+            <div class="ob-stage-spacer"></div>
+            <div class="ob-controls" style="--after:2">
+                <div class="ob-hearts" id="obHearts" role="radiogroup" aria-label="Colore del cuore">
+                    <button type="button" role="radio" data-heart="rosa" aria-checked="true" style="--hc:#FF9AD5">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obHeart"/></svg><span>Rosa</span><small>tenerezza</small>
+                    </button>
+                    <button type="button" role="radio" data-heart="giallo" aria-checked="false" style="--hc:#FFD978">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obHeart"/></svg><span>Giallo</span><small>luce</small>
+                    </button>
+                    <button type="button" role="radio" data-heart="azzurro" aria-checked="false" style="--hc:#94D6FF">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obHeart"/></svg><span>Azzurro</span><small>quiete</small>
+                    </button>
+                </div>
+                <button class="ob-btn ob-btn-primary" type="button" data-action="next">Batte così</button>
+            </div>
+        </section>
+
+        <!-- Oggetti: al massimo due -->
+        <section class="ob-scene" data-scene="oggetti" aria-labelledby="obT-oggetti">
+            <div class="ob-text">
+                <h2 class="ob-line ob-title" id="obT-oggetti" style="--i:0">Cosa vuoi tenere vicino?</h2>
+                <p class="ob-line ob-sub" style="--i:1">Scegli fino a due cose: ognuna ti porta verso un esercizio.</p>
+            </div>
+            <div class="ob-stage-spacer"></div>
+            <div class="ob-controls" style="--after:1.6">
+                <div class="ob-objects" id="obObjects" role="group" aria-label="Oggetti, al massimo due">
+                    <button type="button" class="ob-object" data-object="lavanda" aria-pressed="false">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcLavanda"/></svg><span>Lavanda</span><small>Respiro profondo</small>
+                    </button>
+                    <button type="button" class="ob-object" data-object="copertina" aria-pressed="false">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcCopertina"/></svg><span>Copertina</span><small>Rilassa i muscoli</small>
+                    </button>
+                    <button type="button" class="ob-object" data-object="lucina" aria-pressed="false">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcLucina"/></svg><span>Lucina-luna</span><small>Ascolta il battito</small>
+                    </button>
+                    <button type="button" class="ob-object" data-object="cuffiette" aria-pressed="false">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#obIcCuffie"/></svg><span>Cuffiette</span><small>Terapia del suono</small>
+                    </button>
+                </div>
+                <p class="ob-hint" id="obObjectsHint" aria-live="polite">Puoi anche non sceglierne nessuno.</p>
+                <button class="ob-btn ob-btn-primary" type="button" data-action="next">Ecco</button>
+            </div>
+        </section>
+
+        <!-- Nome -->
+        <section class="ob-scene" data-scene="nome" aria-labelledby="obT-nome">
+            <div class="ob-text">
+                <h2 class="ob-line ob-title" id="obT-nome" style="--i:0">Come si chiama?</h2>
+            </div>
+            <div class="ob-stage-spacer"></div>
+            <div class="ob-controls" style="--after:1">
+                <label class="ob-sr" for="obNameInput">Nome del tuo compagno</label>
+                <input class="ob-name-input" id="obNameInput" type="text" maxlength="20" autocomplete="off" spellcheck="false" placeholder="Scrivi un nome…">
+                <div class="ob-suggestions" id="obSuggestions" aria-label="Suggerimenti">
+                    <button type="button">Luna</button>
+                    <button type="button">Nuvola</button>
+                    <button type="button">Miele</button>
+                </div>
+                <button class="ob-btn ob-btn-primary" type="button" data-action="next">Piacere</button>
+            </div>
+        </section>
+
+        <!-- ================= LILY ================= -->
+
+        <!-- Lily fa un brutto sogno -->
+        <section class="ob-scene" data-scene="lily" aria-labelledby="obT-lily">
+            <div class="ob-text">
+                <h2 class="ob-line ob-title" id="obT-lily" style="--i:0">Shh… Lily sta facendo un brutto sogno.</h2>
+                <p class="ob-line ob-sub" style="--i:1">Tu e <span data-name>Laska</span> potete aiutarla?</p>
+            </div>
+            <div class="ob-stage-spacer"></div>
+            <div class="ob-controls ob-controls-row" style="--after:2.4">
+                <button class="ob-btn ob-btn-primary" type="button" data-action="help">Aiutiamola</button>
+                <button class="ob-btn ob-btn-ghost" type="button" data-action="go-ahead">Vai avanti</button>
+            </div>
+        </section>
+
+        <!-- Respira con Lily (il tuo Laska respira con te) -->
+        <section class="ob-scene" data-scene="respiro" aria-labelledby="obT-respiro">
+            <div class="ob-text">
+                <h2 class="ob-line ob-title" id="obT-respiro" style="--i:0">Respira con Lily.</h2>
+                <p class="ob-line ob-sub ob-breath-guide" style="--i:1">Tieni premuto per inspirare, lascia andare per espirare. <span data-name>Laska</span> respira con te.</p>
+                <div class="ob-breath-done" aria-live="polite">
+                    <p class="ob-title ob-done-line">Bravo. Lily si è calmata.</p>
+                    <p class="ob-sub ob-done-line">E anche tu, forse, un po' di più.</p>
                 </div>
             </div>
-            <div class="carousel-color-dots" id="colorCarouselDots">
-                <!-- Popolato dinamicamente da app.js -->
+            <div class="ob-stage-spacer"></div>
+            <div class="ob-controls" style="--after:1.5">
+                <div class="ob-breath-count" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+                <button class="ob-breath-btn" id="obBreathBtn" type="button" aria-describedby="obBreathHelp">
+                    <span class="ob-breath-ring"></span>
+                    <span class="ob-breath-label" id="obBreathLabel">Tieni premuto</span>
+                </button>
+                <p class="ob-hint" id="obBreathHelp">Anche con la barra spaziatrice</p>
+                <button class="ob-btn ob-btn-primary ob-breath-continue" type="button" data-action="next">Continua</button>
             </div>
-        </div>
+        </section>
 
-        <!-- Carousel Selezione Cuore -->
-        <div id="heartCarousel" class="plush-carousel-container" style="display:none;">
-            <div class="carousel-viewport" id="heartCarouselViewport">
-                <div class="carousel-track" id="heartCarouselTrack">
-                    <div class="carousel-slide active" data-heart-index="0" data-heart-key="rosa">
-                        <img src="Cuore rosa.png" alt="Cuore Rosa" class="carousel-plush-img" draggable="false">
-                    </div>
-                    <div class="carousel-slide" data-heart-index="1" data-heart-key="giallo">
-                        <img src="heart giallo sfocato.png" alt="Cuore Giallo" class="carousel-plush-img" draggable="false">
-                    </div>
-                    <div class="carousel-slide" data-heart-index="2" data-heart-key="azzurro">
-                        <img src="Cuore rosa.png" alt="Cuore Azzurro" class="carousel-plush-img" style="filter: hue-rotate(200deg) saturate(1.2);" draggable="false">
-                    </div>
-                </div>
+        <!-- Ingresso -->
+        <section class="ob-scene" data-scene="ingresso" aria-labelledby="obT-ingresso">
+            <div class="ob-text">
+                <h2 class="ob-line ob-title" id="obT-ingresso" style="--i:0"><span data-name>Laska</span> è qui con te.</h2>
+                <p class="ob-line ob-sub" style="--i:1">Questo è il vostro posto lento.</p>
             </div>
-            <div class="carousel-color-dots" id="heartCarouselDots">
-                <button class="carousel-dot active" data-index="0" aria-label="Cuore Rosa" style="--dot-color: #F8C3DC;"></button>
-                <button class="carousel-dot" data-index="1" aria-label="Cuore Giallo" style="--dot-color: #FFE066;"></button>
-                <button class="carousel-dot" data-index="2" aria-label="Cuore Azzurro" style="--dot-color: #87CEEB;"></button>
+            <div class="ob-stage-spacer"></div>
+            <div class="ob-controls" style="--after:2">
+                <button class="ob-btn ob-btn-primary" type="button" data-action="finish">Andiamo</button>
             </div>
-        </div>
+        </section>
 
-        <!-- Testo per coniglio ansia.mov -->
-        <div id="coniglioAnsiaSub" style="display:none; position:absolute; top:150px; left:0; width:100%; z-index:10; font-family:'Nunito', sans-serif; font-size:1.6rem; font-weight:400; color:#D2B9FF; text-align:center; text-shadow: 0 2px 10px rgba(0,0,0,0.5); animation: carouselFadeIn 0.8s ease both; pointer-events:none;">
-            Shh... Lily sta facendo un brutto sogno.
-        </div>
-
-        <!-- Bottoni coniglio ansia -->
-        <button id="helpMeBtn" style="display:none; position:absolute; left:400px; top:600px; width:210px; height:60px; background-color:rgba(167, 136, 216, 0.43); border-radius:16px; border:none; color:#FFFFFF; font-family:'Nunito', sans-serif; font-size:1.1rem; font-weight:700; cursor:pointer; z-index:15; transition: transform 0.2s, background-color 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-            aiutami
+        <!-- Frecce -->
+        <button class="ob-arrow ob-arrow-prev" id="obPrevBtn" type="button" aria-label="Indietro">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-        <button id="goAheadBtn" style="display:none; position:absolute; left:900px; top:600px; width:210px; height:60px; background-color:rgba(167, 136, 216, 0.43); border-radius:16px; border:none; color:#FFFFFF; font-family:'Nunito', sans-serif; font-size:1.1rem; font-weight:700; cursor:pointer; z-index:15; transition: transform 0.2s, background-color 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-            vai avanti
+        <button class="ob-arrow ob-arrow-next" id="obNextBtn" type="button" aria-label="Avanti">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-
-        <!-- Esercizio Respirazione -->
-        <div id="breathingExercise" style="display:none; position:absolute; top:650px; left:50%; transform:translateX(-50%); z-index:10; font-family:'Nunito', sans-serif; text-align:center; color:#D2B9FF;">
-            <div id="breathingCircle" style="width:60px; height:60px; border-radius:50%; background-color:rgba(167, 136, 216, 0.3); border: 2px solid #D2B9FF; margin: 0 auto 15px auto; transition: transform 4s ease-in-out, background-color 4s ease-in-out; box-shadow: 0 0 20px rgba(167, 136, 216, 0.4);"></div>
-            <div id="breathingText" style="font-size:1.2rem; font-weight:700; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">Inspira...</div>
-        </div>
-
-        <!-- Successo Respirazione -->
-        <div id="breathingSuccess" style="display:none; position:absolute; top:150px; left:0; width:100%; z-index:15; font-family:'Nunito', sans-serif; font-size:2.5rem; font-weight:700; color:#FFFFFF; text-align:center; text-shadow: 0 2px 15px rgba(0,0,0,0.8); animation: carouselFadeIn 1s ease both;">
-            complimenti! laly si è calmata
-        </div>
     </div>
 
     <!-- Sfondo con sfere fluttuanti sfocate (Soft Orbs Effect) -->
@@ -139,35 +441,26 @@
 
 
 
+    <!-- Velo luminoso che accompagna il passaggio tra le pagine -->
+    <div class="nav-veil" id="navVeil" aria-hidden="true"></div>
+
+    <!-- Indicatore discreto del capitolo in cui ti trovi -->
+    <p class="chapter-indicator" id="chapterIndicator" aria-hidden="true"><span>I</span> Il battito</p>
+
     <!-- Contenitore Principale -->
     <main class="main-content">
 
         <!-- HEADER di Navigazione Sticky -->
         <header class="logo-header">
-            <div class="logo-text-wrapper">
-                <div class="logo">
-                    <img src="LASKA.png" alt="Laska Logo" class="logo-img">
-                </div>
-                <div class="tagline">Senti il tuo cuore. Respira.</div>
-            </div>
-
             <div class="header-right">
-                <!-- Selettore del Tema Cromatico -->
-                <div class="theme-selector">
-                    <button class="theme-toggle-btn active" id="themeOriginalBtn" aria-label="Tema Lilla"
-                        title="Tema Lilla"></button>
-                    <button class="theme-toggle-btn" id="themeBlueBtn" aria-label="Tema Azzurro Blu"
-                        title="Tema Azzurro Blu"></button>
-                </div>
-
                 <!-- Pulsante Stanza della Calma -->
-                <button class="room-nav-btn" id="headerRoomBtn" aria-label="Vai alla Stanza della Pioggia"
-                    title="Stanza della Pioggia">
+                <button class="room-nav-btn" id="headerRoomBtn" aria-label="Vai al Rifugio"
+                    title="Il Rifugio">
                     <span class="room-nav-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polygon
                                 points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                        </svg></span> Stanza
+                        </svg></span> Rifugio
                 </button>
 
 
@@ -197,13 +490,109 @@
         <div id="home-view" class="page-view active visible">
 
             <!-- SECTION 1 — HERO: THE HEARTBEAT -->
-            <section class="hero-section">
-                <!-- Sfondo Video Infinito -->
-                <video id="heroBgVideo" src="video ripetizione.mov" autoplay loop muted playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1;"></video>
+            <section class="hero-section chapter" id="cap-battito" data-chapter="I" data-chapter-name="Il battito" aria-label="Capitolo I, Il battito">
+                <!-- Cielo stellato della home (stile "glimmer") -->
+                <div class="hero-sky" aria-hidden="true">
+                    <svg width="0" height="0" style="position:absolute">
+                        <symbol id="laskaSparkle" viewBox="0 0 24 24">
+                            <path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/>
+                        </symbol>
+                    </svg>
+                    <div class="sky-dust sky-dust-a"></div>
+                    <div class="sky-dust sky-dust-b"></div>
+                    <svg class="sky-sparkle" style="--x:10%;--y:18%;--s:22px;--d:0s;--o:0.95"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle" style="--x:22%;--y:62%;--s:16px;--d:1.4s;--o:0.7"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle" style="--x:15%;--y:84%;--s:12px;--d:2.6s;--o:0.5"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle" style="--x:30%;--y:30%;--s:12px;--d:0.8s;--o:0.5"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle" style="--x:71%;--y:22%;--s:14px;--d:2.1s;--o:0.6"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle" style="--x:84%;--y:12%;--s:22px;--d:0.4s;--o:0.95"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle" style="--x:90%;--y:58%;--s:18px;--d:1.7s;--o:0.8"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle" style="--x:78%;--y:82%;--s:12px;--d:3s;--o:0.5"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle" style="--x:64%;--y:90%;--s:10px;--d:1.1s;--o:0.4"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle" style="--x:38%;--y:86%;--s:10px;--d:2.3s;--o:0.4"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle" style="--x:95%;--y:34%;--s:10px;--d:0.9s;--o:0.45"><use href="#laskaSparkle"/></svg>
+                    <!-- Stelle che si accendono solo quando ti calmi -->
+                    <svg class="sky-sparkle sky-sparkle-calm" style="--x:6%;--y:40%;--s:12px;--d:1.3s;--o:calc(.7 * var(--calm, 0))"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle sky-sparkle-calm" style="--x:20%;--y:8%;--s:10px;--d:2.4s;--o:calc(.6 * var(--calm, 0))"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle sky-sparkle-calm" style="--x:46%;--y:12%;--s:14px;--d:.5s;--o:calc(.8 * var(--calm, 0))"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle sky-sparkle-calm" style="--x:58%;--y:6%;--s:10px;--d:3.2s;--o:calc(.6 * var(--calm, 0))"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle sky-sparkle-calm" style="--x:63%;--y:36%;--s:12px;--d:1.9s;--o:calc(.7 * var(--calm, 0))"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle sky-sparkle-calm" style="--x:80%;--y:46%;--s:10px;--d:2.8s;--o:calc(.55 * var(--calm, 0))"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle sky-sparkle-calm" style="--x:97%;--y:8%;--s:12px;--d:.2s;--o:calc(.7 * var(--calm, 0))"><use href="#laskaSparkle"/></svg>
+                    <svg class="sky-sparkle sky-sparkle-calm" style="--x:3%;--y:70%;--s:10px;--d:1.6s;--o:calc(.6 * var(--calm, 0))"><use href="#laskaSparkle"/></svg>
+                </div>
+
+                <!-- Luna luminosa con il coniglietto che dorme davanti -->
+                <div class="hero-moon-scene">
+                    <svg class="hero-moon" viewBox="0 0 400 400" aria-hidden="true">
+                        <defs>
+
+                            <radialGradient id="moonFill" cx="35%" cy="65%" r="75%">
+                                <stop offset="0%" class="moon-stop-1"/>
+                                <stop offset="100%" class="moon-stop-2"/>
+                            </radialGradient>
+                            <filter id="moonSpeckles" x="0" y="0" width="100%" height="100%">
+                                <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="4" result="n"/>
+                                <feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 9 -5.6" result="speck"/>
+                                <feComposite in="speck" in2="SourceGraphic" operator="in" result="speckOnMoon"/>
+                                <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="speckOnMoon"/></feMerge>
+                            </filter>
+                        </defs>
+                        <!-- Parte illuminata: la forma viene aggiornata da uno script (fasi lunari) -->
+                        <path id="heroMoonLit" d="M200 50 A150 150 0 0 0 200 350 A120 150 0 0 1 200 50 Z"
+                            fill="url(#moonFill)" filter="url(#moonSpeckles)"/>
+                    </svg>
+                    <div class="hero-ground-glow" aria-hidden="true"></div>
+                    <div class="hero-bunny-wrap" data-animal="peluche">
+                        <img src="compagni/peluche-classico.webp" alt="Laska, il tuo compagno, che dorme" class="hero-bunny" draggable="false">
+                        <span class="hero-bunny-heart" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21.2s-7.6-4.7-9.7-9.3C.8 8.5 2.9 4.8 6.4 4.8c2.1 0 3.6 1.2 4.4 2.6.4.7 1.9.7 2.3 0 .8-1.4 2.3-2.6 4.4-2.6 3.5 0 5.6 3.7 4.1 7.1-2.1 4.6-9.6 9.3-9.6 9.3z"/></svg></span>
+                        <p class="hero-companion-name" aria-live="polite">Laska</p>
+                        <p class="hero-calm-message" id="heroCalmMessage" aria-live="polite"></p>
+                    </div>
+                </div>
+
+                <!-- Pannello della calma: Respira, Accarezza, Sintonizza (logica in calm.js) -->
+                <div class="calm-dock" id="calmDock" role="group" aria-label="Calma il battito">
+                    <div class="calm-status">
+                        <span class="calm-bpm">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2s-7.6-4.7-9.7-9.3C.8 8.5 2.9 4.8 6.4 4.8c2.1 0 3.6 1.2 4.4 2.6.4.7 1.9.7 2.3 0 .8-1.4 2.3-2.6 4.4-2.6 3.5 0 5.6 3.7 4.1 7.1-2.1 4.6-9.6 9.3-9.6 9.3z"/></svg>
+                            <b id="calmBpm">120</b><small>BPM</small>
+                        </span>
+                        <span class="calm-state" id="calmState" aria-live="polite">Il cuore corre</span>
+                    </div>
+                    <div class="calm-tabs" role="tablist" aria-label="Come vuoi calmarti?">
+                        <button type="button" role="tab" id="calmTabBreathe" data-mode="breathe" aria-controls="calmPanelBreathe" aria-selected="true">Respira</button>
+                        <button type="button" role="tab" id="calmTabStroke" data-mode="stroke" aria-controls="calmPanelStroke" aria-selected="false" tabindex="-1">Accarezza</button>
+                        <button type="button" role="tab" id="calmTabSync" data-mode="sync" aria-controls="calmPanelSync" aria-selected="false" tabindex="-1">Sintonizza</button>
+                    </div>
+                    <div class="calm-panel" id="calmPanelBreathe" role="tabpanel" aria-labelledby="calmTabBreathe">
+                        <button type="button" class="calm-hold" id="calmHoldBtn" aria-describedby="calmBreatheHint">
+                            <span class="calm-hold-ring" aria-hidden="true"></span>
+                            <span class="calm-hold-label" id="calmHoldLabel">Tieni premuto</span>
+                        </button>
+                        <p class="calm-hint" id="calmBreatheHint">Tieni premuto per inspirare, lascia andare per espirare. Anche con la barra spaziatrice.</p>
+                    </div>
+                    <div class="calm-panel" id="calmPanelStroke" role="tabpanel" aria-labelledby="calmTabStroke" hidden>
+                        <div class="calm-stroke-col">
+                            <p class="calm-hint" id="calmStrokeHint">Accarezza Laska piano, con il mouse o con il dito.</p>
+                            <div class="calm-progress" aria-hidden="true"><i id="calmStrokeBar"></i></div>
+                            <button type="button" class="calm-key-btn" id="calmStrokeKey">Oppure tieni premuto qui</button>
+                        </div>
+                    </div>
+                    <div class="calm-panel" id="calmPanelSync" role="tabpanel" aria-labelledby="calmTabSync" hidden>
+                        <span class="calm-metro" aria-hidden="true"></span>
+                        <button type="button" class="calm-tap" id="calmTapBtn" aria-describedby="calmSyncHint">Tocca a ritmo</button>
+                        <p class="calm-hint" id="calmSyncHint">Tocca insieme alla luce, una volta al secondo.</p>
+                    </div>
+                </div>
+
+                <!-- Invito a scendere verso gli esercizi -->
+                <button class="hero-scroll-cue" id="heroScrollCue" data-goto="respira" aria-label="Vai al capitolo II, Respira">
+                    <span>Respira</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
                 
 
-                <!-- Pixel Stars Background Overlay -->
-                <div class="pixel-stars-container" id="pixelStarsBackground"></div>
 
 
                 <!-- Blurry Yellow Heart Background Glow -->
@@ -365,6 +754,69 @@
                 </div>
             </section>
 
+
+            <!-- ================= CAPITOLO II — RESPIRA ================= -->
+            <section class="chapter" id="cap-respira" data-chapter="II" data-chapter-name="Respira">
+
+            <!-- Introduzione del capitolo II -->
+            <header class="chapter-intro" aria-labelledby="chapterTitle2">
+                <div class="chapter-intro-sky" aria-hidden="true"></div>
+                <div class="chapter-intro-inner">
+                    <p class="chapter-num">Capitolo II</p>
+                <h2 class="chapter-title" id="chapterTitle2">Respira</h2>
+                <p class="chapter-line">Il respiro è la parte dell'ansia che puoi guidare tu.</p>
+                </div>
+                <span class="chapter-cue" aria-hidden="true"><span>Scendi</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+            </header>
+
+            <!-- Respira con lo scorrimento: scendendo inspiri, poi trattieni, poi espiri -->
+            <section class="scroll-breath" aria-label="Respira mentre scorri: inspira, trattieni, espira">
+                <div class="scroll-breath-sticky">
+                    <div class="scroll-breath-orb" aria-hidden="true"><span></span></div>
+                    <div class="scroll-breath-words">
+                        <p class="sb-word sb-in">Inspira</p>
+                        <p class="sb-word sb-hold">Trattieni</p>
+                        <p class="sb-word sb-out">Espira</p>
+                        <p class="sb-word sb-end">Così. Ora scegli tu.</p>
+                    </div>
+                    <p class="scroll-breath-hint">Scorri piano: è la pagina a respirare con te</p>
+                    <div class="scroll-breath-bar" aria-hidden="true"><i></i></div>
+                </div>
+            </section>
+
+            <section class="feel-section" id="feelSection" aria-labelledby="feelTitle">
+                <div class="section-header">
+                    <h2 class="section-title" id="feelTitle">Cosa senti adesso?</h2>
+                    <p class="section-subtitle">Scegli quello che ti somiglia di più: ti porto all'esercizio giusto.</p>
+                </div>
+                <div class="feel-grid">
+                    <button type="button" class="feel-card" data-exercise="2" aria-describedby="feelHintmente">
+                        <span class="feel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6c0 2.2 1.2 3.6 2.3 4.6.7.7 1.2 1.6 1.2 2.6V18h5v-1.8c0-1 .5-1.9 1.2-2.6C16.8 12.6 18 11.2 18 9a6 6 0 0 0-6-6z"/><path d="M10 21h4"/><path d="M8.5 8.5c.8-.8 2-.8 2.8 0M13 6.8c.9-.4 2-.1 2.5.8"/></svg></span>
+                        <span class="feel-title">La mente che corre</span>
+                        <span class="feel-sub">Pensieri che non si fermano</span>
+                        <span class="ob-sr" id="feelHintmente">Ti porto a "Torna al presente"</span>
+                    </button>
+                    <button type="button" class="feel-card" data-exercise="4" aria-describedby="feelHintcorpo">
+                        <span class="feel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.5v6"/><path d="M7 10.5c1.6 1 3.2 1.5 5 1.5s3.4-.5 5-1.5"/><path d="M9.5 21l2.5-7.5L14.5 21"/></svg></span>
+                        <span class="feel-title">Il corpo teso</span>
+                        <span class="feel-sub">Spalle, mascella, pugni stretti</span>
+                        <span class="ob-sr" id="feelHintcorpo">Ti porto a "Rilassa i muscoli"</span>
+                    </button>
+                    <button type="button" class="feel-card" data-exercise="6" aria-describedby="feelHintpaura">
+                        <span class="feel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg></span>
+                        <span class="feel-title">Una paura improvvisa</span>
+                        <span class="feel-sub">Il cuore che accelera di colpo</span>
+                        <span class="ob-sr" id="feelHintpaura">Ti porto a "Respiro profondo"</span>
+                    </button>
+                    <button type="button" class="feel-card" data-exercise="5" aria-describedby="feelHintsonno">
+                        <span class="feel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/><path d="M15 4h3l-3 3h3"/></svg></span>
+                        <span class="feel-title">Non riesco a dormire</span>
+                        <span class="feel-sub">La notte sembra lunghissima</span>
+                        <span class="ob-sr" id="feelHintsonno">Ti porto a "Terapia del suono"</span>
+                    </button>
+                </div>            </section>
+
+            <div class="respira-all" id="respiraTutti">
             <!-- SECTION 2 — ANXIETY RELIEF EXERCISES -->
             <section class="exercises-section">
                 <div class="section-header">
@@ -451,93 +903,22 @@
                 </div>
             </section>
 
-            <!-- BANNER DEL TEST DEI PELUCHE -->
-            <section class="plush-quiz-banner-section">
-                <div class="plush-quiz-banner-container card-prevention">
-                    <div class="plush-quiz-banner-content">
-                        <div class="banner-badge">Test Interattivo</div>
-                        <h3 class="banner-title">Qual è il tuo compagno Laska ideale?</h3>
-                        <p class="banner-desc">Rispondi a poche domande sulle tue abitudini, paure e inclinazioni per
-                            scoprire quale dei nostri peluche terapeutici si allinea perfettamente alle tue necessità di
-                            rilassamento.</p>
-                        <button class="btn btn-primary" id="homeToPlushQuizBtn">Scopri il tuo Peluche</button>
-                    </div>
-
-                </div>
+            </div>
             </section>
 
-            <!-- SECTION 3 — PRODUCT SECTION -->
-            <section class="products-section">
-                <div class="section-header">
-                    <h2 class="section-title">I tuoi compagni per la calma</h2>
-                    <p class="section-subtitle">Peluche morbidi terapeutici con un cuore pulsante interno progettati per
-                        placare l'ansia.</p>
+            <!-- ================= CAPITOLO III — CAPIRE ================= -->
+            <section class="chapter" id="cap-capire" data-chapter="III" data-chapter-name="Capire">
+
+            <!-- Introduzione del capitolo III -->
+            <header class="chapter-intro" aria-labelledby="chapterTitle3">
+                <div class="chapter-intro-sky" aria-hidden="true"></div>
+                <div class="chapter-intro-inner">
+                    <p class="chapter-num">Capitolo III</p>
+                <h2 class="chapter-title" id="chapterTitle3">Capire</h2>
+                <p class="chapter-line">Quello che senti ha un nome. E no, non stai esagerando.</p>
                 </div>
-
-                <!-- Griglia dei Prodotti -->
-                <div class="products-grid">
-
-                    <!-- Prodotto 1: Orsetto -->
-                    <article class="product-card clickable-product" data-product-id="1">
-                        <div class="product-image-container">
-                            <img src="orso 1.png" alt="Peluche Orsetto"
-                                class="product-img interactive-plush">
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-name">Orsetto Lavanda</h3>
-                            <p class="product-desc">Il tuo compagno ideale per i momenti difficili. Rilascia un delicato
-                                aroma rilassante e simula un respiro calmo.</p>
-                            <div class="product-meta">
-                                <span class="product-price">34,90 €</span>
-                                <button class="btn btn-secondary select-product-btn" data-product-id="1">Scopri di
-                                    più</button>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- Prodotto 2: Peluche -->
-                    <article class="product-card clickable-product" data-product-id="2">
-                        <div class="product-image-container">
-                            <img src="peluche 1.png" alt="Peluche Calmo"
-                                class="product-img interactive-plush">
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-name">Peluche Calmo</h3>
-                            <p class="product-desc">Morbido peluche rassicurante con sensore di battito
-                                cardiaco integrato per rassicurare bambini e adulti.</p>
-                            <div class="product-meta">
-                                <span class="product-price">34,90 €</span>
-                                <button class="btn btn-secondary select-product-btn" data-product-id="2">Scopri di
-                                    più</button>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- Prodotto 3: Koala -->
-                    <article class="product-card clickable-product" data-product-id="3">
-                        <div class="product-image-container">
-                            <img src="koala 1.png" alt="Peluche Koala"
-                                class="product-img interactive-plush">
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-name">Koala Rilassante</h3>
-                            <p class="product-desc">Progettato per l'abbraccio profondo. Il suo corpo pesante e il
-                                battito caldo aiutano ad addormentarsi in pace.</p>
-                            <div class="product-meta">
-                                <span class="product-price">39,90 €</span>
-                                <button class="btn btn-secondary select-product-btn" data-product-id="3">Scopri di
-                                    più</button>
-                            </div>
-                        </div>
-                    </article>
-
-                </div>
-            </section>
-
-        </div> <!-- Fine home-view -->
-
-        <!-- Vista Informazioni -->
-        <div id="info-view" class="page-view">
+                <span class="chapter-cue" aria-hidden="true"><span>Scorri piano</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+            </header>
 
             <!-- SECTION 1.5 — VIVERE CON L'ANSIA (AWARENESS) -->
             <section class="anxiety-experience-section" id="anxiety-section">
@@ -554,7 +935,10 @@
                         totalizzante, un rumore di fondo costante che altera la percezione della realtà quotidiana.
                     </p>
 
-                    <div class="experience-grid">
+                    <div class="experience-grid story-steps">
+                        <div class="story-ecg" aria-hidden="true">
+                            <svg viewBox="0 0 1000 200" preserveAspectRatio="none"><path pathLength="1" d="M0 100.0 L14 100.0 L20 40.0 L27 170.0 L34 70.0 L40 100.0 L52 100.0 L52 100.0 L66 100.0 L72 40.0 L79 170.0 L86 70.0 L92 100.0 L104 100.0 L104 100.0 L118 100.0 L124 40.0 L131 170.0 L138 70.0 L144 100.0 L156 100.0 L156 100.0 L170 100.0 L176 40.0 L183 170.0 L190 70.0 L196 100.0 L208 100.0 L208 100.0 L222 100.0 L228 40.0 L235 170.0 L242 70.0 L248 100.0 L260 100.0 L260 100.0 L274 100.0 L280 40.0 L287 170.0 L294 70.0 L300 100.0 L312 100.0 L312 100.0 L326 100.0 L332 40.0 L339 170.0 L346 70.0 L352 100.0 L364 100.0 L364 100.0 L378 100.0 L384 40.0 L391 170.0 L398 70.0 L404 100.0 L416 100.0 L416 100.0 L430 100.0 L436 40.0 L443 170.0 L450 70.0 L456 100.0 L468 100.0 L468 100.0 L482 100.0 L488 40.0 L495 170.0 L502 70.0 L508 100.0 L520 100.0 L520 100.0 L528 102.8 L536 105.5 L544 107.9 L552 110.0 L560 111.8 L568 113.0 L576 113.8 L584 114.0 L592 113.6 L600 112.7 L608 111.3 L616 109.5 L624 107.2 L632 104.7 L640 102.0 L648 99.2 L656 96.4 L664 93.8 L672 91.4 L680 89.4 L688 87.8 L696 86.7 L704 86.1 L712 86.1 L720 86.6 L728 87.6 L736 89.2 L744 91.2 L752 93.5 L760 96.1 L768 98.8 L776 101.6 L784 104.4 L792 106.9 L800 109.2 L808 111.1 L816 112.6 L824 113.6 L832 114.0 L840 113.9 L848 113.2 L856 112.0 L864 110.3 L872 108.2 L880 105.8 L888 103.1 L896 100.3 L904 97.6 L912 94.9 L920 92.4 L928 90.2 L936 88.4 L944 87.1 L952 86.3 L960 86.0 L968 86.3 L976 87.1 L984 88.5 L992 90.3 L1000 92.5"/></svg>
+                        </div>
                         <div class="experience-card">
                             <div class="experience-card-icon">
                                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -649,7 +1033,7 @@
                         <h3>Quello che in pochi capiscono</h3>
                     </div>
 
-                    <div class="stat-container">
+                    <div class="stat-container story-step">
                         <div class="stat-box">
                             <span class="stat-number">300M+</span>
                             <p class="stat-desc">Le persone nel mondo che convivono ogni giorno con disturbi d'ansia,
@@ -880,7 +1264,129 @@
                     </article>
                 </div>
             </section>
+            </section>
 
+            <!-- ================= CAPITOLO IV — IL COMPAGNO ================= -->
+            <section class="chapter" id="cap-compagno" data-chapter="IV" data-chapter-name="Il compagno">
+
+            <!-- Introduzione del capitolo IV -->
+            <header class="chapter-intro" aria-labelledby="chapterTitle4">
+                <div class="chapter-intro-sky" aria-hidden="true"></div>
+                <div class="chapter-intro-inner">
+                    <p class="chapter-num">Capitolo IV</p>
+                <h2 class="chapter-title" id="chapterTitle4">Il compagno</h2>
+                <p class="chapter-line">Un peluche con un cuore che batte piano, per le notti più lunghe.</p>
+                </div>
+                <span class="chapter-cue" aria-hidden="true"><span>Scendi</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+            </header>
+
+            <!-- SECTION 3 — PRODUCT SECTION -->
+            <section class="products-section">
+                <div class="section-header">
+                    <h2 class="section-title">I tuoi compagni per la calma</h2>
+                    <p class="section-subtitle">Peluche morbidi terapeutici con un cuore pulsante interno progettati per
+                        placare l'ansia.</p>
+                </div>
+
+                <!-- Griglia dei Prodotti -->
+                <div class="products-grid">
+
+                    <!-- Prodotto 1: Orsetto -->
+                    <article class="product-card clickable-product" data-product-id="1">
+                        <div class="product-image-container">
+                            <img src="orso 1.png" alt="Peluche Orsetto"
+                                class="product-img interactive-plush">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Orsetto Lavanda</h3>
+                            <p class="product-desc">Il tuo compagno ideale per i momenti difficili. Rilascia un delicato
+                                aroma rilassante e simula un respiro calmo.</p>
+                            <div class="product-meta">
+                                <span class="product-price">34,90 €</span>
+                                <button class="btn btn-secondary select-product-btn" data-product-id="1">Scopri di
+                                    più</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Prodotto 2: Peluche -->
+                    <article class="product-card clickable-product" data-product-id="2">
+                        <div class="product-image-container">
+                            <img src="peluche 1.png" alt="Peluche Calmo"
+                                class="product-img interactive-plush">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Peluche Calmo</h3>
+                            <p class="product-desc">Morbido peluche rassicurante con sensore di battito
+                                cardiaco integrato per rassicurare bambini e adulti.</p>
+                            <div class="product-meta">
+                                <span class="product-price">34,90 €</span>
+                                <button class="btn btn-secondary select-product-btn" data-product-id="2">Scopri di
+                                    più</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Prodotto 3: Koala -->
+                    <article class="product-card clickable-product" data-product-id="3">
+                        <div class="product-image-container">
+                            <img src="koala 1.png" alt="Peluche Koala"
+                                class="product-img interactive-plush">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Koala Rilassante</h3>
+                            <p class="product-desc">Progettato per l'abbraccio profondo. Il suo corpo pesante e il
+                                battito caldo aiutano ad addormentarsi in pace.</p>
+                            <div class="product-meta">
+                                <span class="product-price">39,90 €</span>
+                                <button class="btn btn-secondary select-product-btn" data-product-id="3">Scopri di
+                                    più</button>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+            </section>
+            </section>
+
+            <!-- Fine del percorso -->
+            <nav class="chapter-next chapter-end" aria-label="Fine del percorso">
+                <p class="chapter-next-label">Il percorso finisce qui. Puoi tornare quando vuoi.</p>
+                <div class="chapter-end-actions">
+                    <button type="button" class="btn btn-secondary" data-goto="battito">Torna all'inizio</button>
+                    <button type="button" class="btn btn-primary" data-goto="rifugio">Vai al Rifugio</button>
+                </div>
+            </nav>
+        </div> <!-- Fine home-view -->
+
+        <!-- Vista Informazioni -->
+        <!-- ================= IL RIFUGIO (fuori dal percorso) ================= -->
+        <div id="rifugio-view" class="page-view" data-place="rifugio">
+            <header class="rifugio-intro" aria-labelledby="rifugioTitle">
+                <div class="chapter-intro-sky" aria-hidden="true"></div>
+                <div class="chapter-intro-inner">
+                    <p class="chapter-num">Fuori dal percorso</p>
+                <h1 class="chapter-title" id="rifugioTitle">Il Rifugio</h1>
+                <p class="chapter-line">Un posto dove restare, quando vuoi. Senza fretta.</p>
+                </div>
+            </header>
+            <section class="rifugio-places" aria-label="Luoghi del Rifugio">
+                <button type="button" class="rifugio-card" id="rifugioRoomBtn">
+                    <span class="rifugio-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-5h6v5"/></svg></span>
+                    <span class="rifugio-card-title">La stanza</span>
+                    <span class="rifugio-card-sub">Pioggia, onde, aurora, montagna: scegli dove stare.</span>
+                </button>
+                <button type="button" class="rifugio-card" id="rifugioSoundBtn">
+                    <span class="rifugio-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h2l2-6 3 12 3-9 2 5 2-2h4"/></svg></span>
+                    <span class="rifugio-card-title">Suoni della notte</span>
+                    <span class="rifugio-card-sub">Foresta, oceano, pioggia, campane tibetane.</span>
+                </button>
+                <button type="button" class="rifugio-card" id="rifugioPlaylistBtn">
+                    <span class="rifugio-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+                    <span class="rifugio-card-title">Le playlist</span>
+                    <span class="rifugio-card-sub">La musica che aiuta altre persone, e la tua.</span>
+                </button>
+            </section>
             <!-- SECTION 2.7 — SPOTIFY COMMUNITY PLAYLISTS -->
             <section class="spotify-exchange-section"
                 style="margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--panel-border);">
@@ -1020,7 +1526,13 @@
                     </div>
                 </div>
             </section>
-        </div> <!-- Fine info-view -->
+            <nav class="chapter-next chapter-end" aria-label="Torna al percorso">
+                <p class="chapter-next-label">Quando vuoi, il percorso è qui.</p>
+                <div class="chapter-end-actions">
+                    <button type="button" class="btn btn-secondary" data-goto="battito">Torna al battito</button>
+                </div>
+            </nav>
+        </div> <!-- Fine rifugio-view -->
 
         <!-- Vista Quiz -->
         <div id="quiz-view" class="page-view">
@@ -1100,82 +1612,6 @@
             </section>
         </div>
 
-        <!-- Vista Test Plushie: Quale Peluche Sei? -->
-        <div id="plush-quiz-view" class="page-view">
-            <section class="quiz-section">
-                <div class="section-header">
-                    <h2 class="section-title">Test: Che Peluche Laska sei?</h2>
-                    <p class="section-subtitle">Rispondi a poche semplici domande sulle tue abitudini, paure e
-                        inclinazioni per scoprire il tuo compagno di rilassamento perfetto.</p>
-                </div>
-
-                <div class="quiz-container card-prevention">
-                    <!-- Schermata Iniziale del Quiz -->
-                    <div id="plush-quiz-intro" class="quiz-step-panel">
-                        <div class="quiz-intro-icon">
-                            <span style="font-size: 3.5rem;">🧸</span>
-                        </div>
-                        <h3>Trova la tua anima affine</h3>
-                        <p>Ogni peluche Laska possiede caratteristiche uniche progettate per calmare specifiche
-                            manifestazioni di ansia e stress. Rispondi sinceramente a queste domande per scoprire quale
-                            Laska risuona con la tua energia.</p>
-                        <button class="btn btn-primary btn-large" id="startPlushQuizBtn"
-                            style="margin-top: 1.5rem;">Inizia il Test</button>
-                    </div>
-
-                    <!-- Schermate delle Domande (Dinamiche) -->
-                    <div id="plush-quiz-question-wrapper" class="quiz-step-panel" style="display: none;">
-                        <div class="quiz-progress-bar-wrapper">
-                            <div class="quiz-progress-bar" id="plushQuizProgressBar"></div>
-                        </div>
-                        <div class="quiz-step-info" id="plushQuizStepInfo">Domanda 1 di 5</div>
-                        <h3 class="quiz-question-text" id="plushQuizQuestionText">Testo della domanda</h3>
-
-                        <div class="quiz-options-list">
-                            <button class="quiz-option-btn" id="plushOptionABtn">
-                                <span class="option-letter">A</span>
-                                <span class="option-text" id="plushOptionAText">Opzione A</span>
-                            </button>
-                            <button class="quiz-option-btn" id="plushOptionBBtn">
-                                <span class="option-letter">B</span>
-                                <span class="option-text" id="plushOptionBText">Opzione B</span>
-                            </button>
-                            <button class="quiz-option-btn" id="plushOptionCBtn">
-                                <span class="option-letter">C</span>
-                                <span class="option-text" id="plushOptionCText">Opzione C</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Schermata del Risultato -->
-                    <div id="plush-quiz-result" class="quiz-step-panel" style="display: none; align-items: center;">
-                        <div class="quiz-result-header" style="margin-bottom: 1.5rem;">
-                            <div class="quiz-result-badge" id="plushQuizResultBadge">Il tuo compagno ideale</div>
-                            <h3 id="plushQuizResultTitle" style="font-size: 1.8rem; margin-top: 0.5rem;">Orsetto Lavanda
-                            </h3>
-                        </div>
-
-                        <!-- Plushie Match Display Card -->
-                        <div class="plush-match-card"
-                            style="display: flex; flex-direction: column; align-items: center; gap: 1.5rem; margin-bottom: 2rem; background: rgba(53, 66, 79, 0.02); border: 1px solid var(--panel-border); border-radius: var(--border-radius-medium); padding: 2rem; width: 100%; text-align: center;">
-                            <img id="plushQuizResultImg" src="assets/plush_lavender.png" alt="Plushie Match" class="interactive-plush"
-                                style="max-height: 200px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.1));">
-                            <p class="quiz-result-desc" id="plushQuizResultDesc"
-                                style="margin-bottom: 0; font-size: 0.95rem; line-height: 1.6;">
-                                Descrizione personalizzata del risultato in base alle risposte.
-                            </p>
-                        </div>
-
-                        <div class="quiz-result-actions"
-                            style="margin-top: 1rem; display: flex; gap: 1.2rem; width: 100%;">
-                            <button class="btn btn-secondary flex-1" id="restartPlushQuizBtn">Ripeti il Test</button>
-                            <button class="btn btn-primary flex-1" id="adoptPlushBtn">Adotta il tuo Laska</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-
         <!-- Vista Esercizio Singolo (Focus Mode) -->
         <div id="exercise-view" class="page-view">
             <section class="exercise-focus-section">
@@ -1199,6 +1635,8 @@
                         <div class="exercise-visual visual-rhythm">
                             <!-- Modello 3D heart_in_love.glb al posto dei cerchi di respirazione -->
                             <div class="breathing-heart-3d-container">
+                                <!-- Cuore di riserva: visibile finché il modello 3D (heart_in_love.glb) non è disponibile -->
+                                <img src="Cuore rosa.png" alt="" class="rhythm-heart-fallback" id="rhythmHeartFallback" aria-hidden="true">
                                 <model-viewer id="rhythmHeartViewer" src="heart_in_love.glb" scale="0.6 0.6 0.6"
                                     alt="Modello 3D di un cuore per respirazione" auto-rotate auto-rotate-delay="0"
                                     rotation-per-second="10deg" camera-controls interaction-prompt="none"
@@ -1480,8 +1918,8 @@
                 <video id="roomVideo" src="camera pioggia.mp4" loop playsinline autoplay muted></video>
 
                 <div class="video-controls-overlay">
-                    <button class="video-control-btn" id="roomBackBtn" aria-label="Esci dalla Stanza"
-                        title="Esci dalla Stanza (Torna alla Home)">
+                    <button class="video-control-btn" id="roomBackBtn" aria-label="Esci dalla stanza e torna al Rifugio"
+                        title="Torna al Rifugio">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
                             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -1563,51 +2001,40 @@
                 <button class="close-menu-btn" id="closeMenuBtn" aria-label="Chiudi menu">&times;</button>
             </header>
 
-            <nav class="side-nav">
-                <button class="side-nav-btn active" id="sideNavHomeBtn">
-                    <svg class="icon nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                        <polyline points="9 22 9 12 15 12 15 22" />
-                    </svg>Home
+            <nav class="side-nav" aria-label="Menu principale">
+                <button class="side-nav-btn side-nav-main" id="sideNavRifugioBtn" type="button" data-goto="rifugio">
+                    <svg class="icon nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Rifugio
                 </button>
-                <button class="side-nav-btn" id="sideNavAnxietyBtn">
-                    <svg class="icon nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M12 16v-4M12 8h.01" />
-                    </svg>Vivere con l'Ansia
+                <button class="side-nav-btn side-nav-main" id="sideNavCapireBtn" type="button" data-goto="capire">
+                    <svg class="icon nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Capire
                 </button>
-                <button class="side-nav-btn" id="sideNavRoomBtn">
-                    <svg class="icon nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <polygon
-                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>Stanza Calma
+                <button class="side-nav-btn side-nav-main" id="sideNavCompagniBtn" type="button" data-goto="compagno">
+                    <svg class="icon nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.6 1-1.1a5.5 5.5 0 0 0 0-7.7z"/></svg>Compagni
                 </button>
-                <button class="side-nav-btn" id="sideNavInfoBtn">
-                    <svg class="icon nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                    </svg>Prevenzione Ansia
-                </button>
-                <button class="side-nav-btn" id="sideNavQuizBtn">
-                    <svg class="icon nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                        <line x1="16" y1="13" x2="8" y2="13" />
-                        <line x1="16" y1="17" x2="8" y2="17" />
-                        <polyline points="10 9 9 9 8 9" />
-                    </svg>Test Ansia o Panico
-                </button>
-                <button class="side-nav-btn" id="sideNavPlushQuizBtn">
-                    <span class="nav-icon"
-                        style="margin-right: 12px; font-size: 1.1rem; line-height: 1; display: inline-flex; align-items: center; justify-content: center; width: 20px;">🧸</span>Test:
-                    Che Peluche sei?
+
+                <p class="side-nav-label">Il percorso</p>
+                <div class="side-chapters">
+                    <button class="side-chapter" id="sideChapter1" type="button" data-goto="battito"><b>I</b><span>Il battito</span></button>
+                    <button class="side-chapter" id="sideChapter2" type="button" data-goto="respira"><b>II</b><span>Respira</span></button>
+                    <button class="side-chapter" id="sideChapter3" type="button" data-goto="capire"><b>III</b><span>Capire</span></button>
+                    <button class="side-chapter" id="sideChapter4" type="button" data-goto="compagno"><b>IV</b><span>Il compagno</span></button>
+                </div>
+
+                <button class="side-nav-btn" id="sideNavRecreateBtn" type="button">
+                    <span class="nav-icon" aria-hidden="true" style="margin-right: 12px; display: inline-flex; width: 20px; justify-content: center;">✦</span>Rifai il test / Ricrea il tuo Laska
                 </button>
             </nav>
+
+            <!-- Selettore del Tema Cromatico (spostato dall'header) -->
+            <div class="side-theme-row">
+                <span class="side-theme-label">Atmosfera</span>
+                <div class="theme-selector">
+                    <button class="theme-toggle-btn active" id="themeOriginalBtn" aria-label="Tema Lilla"
+                        title="Tema Lilla"></button>
+                    <button class="theme-toggle-btn" id="themeBlueBtn" aria-label="Tema Azzurro Blu"
+                        title="Tema Azzurro Blu"></button>
+                </div>
+            </div>
 
             <hr class="side-divider">
 
@@ -1643,8 +2070,12 @@
             </div>
 
             <div class="cart-footer-summary" id="cartSummaryBlock" style="display: none;">
+                <div class="cart-summary-row">
+                    <span>Totale</span>
+                    <strong id="cartSubtotal">0,00 €</strong>
+                </div>
             </div>
-            <button class="btn btn-primary btn-block" id="checkoutBtn" style="margin-top: 1.5rem; gap: 8px;">
+            <button class="btn btn-primary btn-block" id="checkoutBtn" style="margin-top: 1.5rem; gap: 8px;" disabled>
                 Procedi all'Acquisto
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
@@ -1653,7 +2084,6 @@
                 </svg>
             </button>
         </div>
-    </div>
     </div>
 
     <!-- Modal di Checkout -->
@@ -1782,7 +2212,53 @@
     </div>
 
     <!-- Script JavaScript -->
-    <script src="app.js?v=20260904"></script>
+    <!-- Se il modello 3D del cuore si carica, nasconde il cuore di riserva -->
+    <script>
+    (function () {
+        var mv = document.getElementById('rhythmHeartViewer');
+        var fb = document.getElementById('rhythmHeartFallback');
+        if (mv && fb) mv.addEventListener('load', function () { fb.style.display = 'none'; });
+    })();
+    </script>
+
+    <!-- Luna della home: la sua fase la decide il livello di calma (calm.js) -->
+    <script>
+    (function () {
+        var lit = document.getElementById('heroMoonLit');
+        var R = 150, CX = 200, CY = 200;
+        var current = 0.07, raf = null;
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        function shape(f) {      // f = frazione illuminata (0..1), luce a sinistra: forma a "C"
+            var rx = Math.abs(1 - 2 * f) * R;
+            var sweep = f < 0.5 ? 1 : 0;
+            return 'M' + CX + ' ' + (CY - R) +
+                   ' A' + R + ' ' + R + ' 0 0 0 ' + CX + ' ' + (CY + R) +
+                   ' A' + rx.toFixed(2) + ' ' + R + ' 0 0 ' + sweep + ' ' + CX + ' ' + (CY - R) + ' Z';
+        }
+        function draw(f) { if (lit) lit.setAttribute('d', shape(f)); }
+        draw(current);
+        window.LaskaMoon = {
+            shape: shape,
+            get: function () { return current; },
+            set: function (target, ms) {
+                target = Math.max(0.02, Math.min(1, target));
+                if (Math.abs(target - current) < 0.002) return;
+                if (raf) cancelAnimationFrame(raf);
+                var from = current, start = performance.now(), dur = reduce ? 1 : (ms || 2200);
+                (function step(now) {
+                    var k = Math.min(1, (now - start) / dur);
+                    current = from + (target - from) * (0.5 - 0.5 * Math.cos(Math.PI * k));
+                    draw(current);
+                    if (k < 1) raf = requestAnimationFrame(step);
+                })(start);
+            }
+        };
+    })();
+    </script>
+    <script src="onboarding.js?v=20261102b"></script>
+    <script src="calm.js?v=20261102b"></script>
+    <script src="app.js?v=20261102e"></script>
+    <script src="scrolly.js?v=20261102e"></script>
 </body>
 
 </html>
